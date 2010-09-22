@@ -55,6 +55,25 @@ class MorfForm extends Gdn_Form {
 		return $Result;
 	}*/
 	
+	public function DropDown($FieldName, $DataSet, $Attributes = FALSE) {
+		// TODO: maybe only for DELIVERY_TYPE_ALL
+		$MaxDropDownTextField = C('Plugins.Morf.MaxLengthDropDownTextField');
+		if(GetIncomingValue('DeliveryType', DELIVERY_TYPE_ALL) != DELIVERY_TYPE_ALL){
+			$MaxTextLength = GetValue('Window', $MaxDropDownTextField);
+		} else $MaxTextLength = GetValue('Default', $MaxDropDownTextField);
+		// TODO: FOR ARRAY DATASET NEED TO
+		if(is_numeric($MaxTextLength) && $MaxTextLength > 0 && is_object($DataSet)){
+			$TextField = ArrayValueI('TextField', $Attributes, 'text');
+			$TestValue = GetValue($TextField, $DataSet->FirstRow());
+			if($TestValue !== False){
+				foreach($DataSet as $Data){
+					$Data->$TextField = SliceString($Data->$TextField, $MaxTextLength);
+				}
+			}			
+		}
+		return parent::DropDown($FieldName, $DataSet, $Attributes);
+	}
+	
 	public static function CheckBoxLabelCallback($Full, $For, $ID, $FieldName){
 		static $Counter = 0;
 		$Counter++;
