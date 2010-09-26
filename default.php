@@ -8,6 +8,7 @@ Some render improvements in form class.
 3) allow intercept form enctype param (example: $Controller->Form->SetMultipart(), call it before render. Controller_Render_Before() is good place);
 4) columned CheckBoxList().
 5) HTML5 form input attributes
+6) Allow strip long text values in dropdown menu
 
 USAGE:
 // HTML5 form input attributes
@@ -28,6 +29,8 @@ TODO:
 - settings / config
 
 CHANGELOG:
+1.4.2 (25 Sep 2010)
+[fix] fixed js load of jscalendar
 1.4.1 (22 Sep 2010)
 [add] MaxLengthDropDownTextField
 1.4 (14 Aug 2010)
@@ -56,8 +59,8 @@ CHANGELOG:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.4.1',
-	'Date' => '22 Sep 2010',
+	'Version' => '1.4.2',
+	'Date' => '25 Sep 2010',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
 	'License' => 'Liandri License'

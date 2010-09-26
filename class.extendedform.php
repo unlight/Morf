@@ -70,6 +70,10 @@ class MorfForm extends Gdn_Form {
 					$Data->$TextField = SliceString($Data->$TextField, $MaxTextLength);
 				}
 			}			
+		} elseif(is_array($DataSet)) {
+			foreach($DataSet as &$Value) {
+				$Value = SliceString($Value, $MaxTextLength);
+			}
 		}
 		return parent::DropDown($FieldName, $DataSet, $Attributes);
 	}
@@ -89,7 +93,7 @@ class MorfForm extends Gdn_Form {
 		$CountItems = $DataSet->NumRows();
 		
 		$ValueField = ArrayValueI('ValueField', $Attributes, 'value');
-        $TextField = ArrayValueI('TextField', $Attributes, 'text');
+		$TextField = ArrayValueI('TextField', $Attributes, 'text');
 		$CountColumns = GetValue('Columns', $Attributes, 4, True);
 		if(GetIncomingValue('DeliveryType', DELIVERY_TYPE_ALL) != DELIVERY_TYPE_ALL) $CountColumns -= 1;
 		

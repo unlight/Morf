@@ -1,7 +1,6 @@
 $(document).ready(function(){
 	
 	if(typeof($.livequery) != 'function') return;
-	var JsDateTimeLoaded = false;
 	var JsDateTimeLoading = false;
 	var i = document.createElement("input");
 	var Inputs = {
@@ -13,38 +12,29 @@ $(document).ready(function(){
 		$.each(Inputs, function(Attribute, settings){
 			if(typeof(Calendar) == 'function'){
 				settings.firstDay = Calendar._FD || 1;
-				/*settings.dateStatusFunc = function(date, year, month, iday){
-					console.log(date, year, month, iday);
-					return 'string'; // this class
-					return true; // disabled
-				};*/
 			}
 			i.setAttribute("type", Attribute);
 			if (i.type != "text") return;
 			// No native date picker support :(
 			$("input[type='"+Attribute+"']").livequery(function(){
-				if(!JsDateTimeLoaded) return LoadJsCalendar();
+				if(!$.isFunction($.fn.dynDateTime)) return LoadJsCalendar();
 				$(this).each(function(index, node){
 					if($(node).data('datetime') != null) return;
 					$(node).attr('autocomplete', 'off').data('datetime', true);
 					$(node).dynDateTime(settings);
-					//console.log($(node));
 				});
 			});
 		});
 	}
 
 	function LoadJsCalendar(){
-		if(JsDateTimeLoaded || JsDateTimeLoading) return;
+		if(JsDateTimeLoading) return;
 		JsDateTimeLoading = true;
 		var jsdatetime = gdn.definition('JsDateTime');
 		$('head').append('<link rel="stylesheet" type="text/css" href="'+jsdatetime + 'skins/aqua/theme.css" media="screen" />');
 		//$.getScript(jsdatetime + 'jquery.dynDateTime.js');
 		$.getScript(jsdatetime + 'jquery.dynDateTime.pack.js');
-		$.getScript(gdn.definition('JsDateTimeLanguage'), function(){
-			JsDateTimeLoaded = true;
-			SetInputs();
-		});
+		$.getScript(gdn.definition('JsDateTimeLanguage'), SetInputs);
 	}
 	
 	SetInputs();
