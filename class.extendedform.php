@@ -1,4 +1,4 @@
-<?php
+<?php if(!defined('APPLICATION')) exit();
 
 class MorfForm extends Gdn_Form {
 	
@@ -62,17 +62,17 @@ class MorfForm extends Gdn_Form {
 			$MaxTextLength = GetValue('Window', $MaxDropDownTextField);
 		} else $MaxTextLength = GetValue('Default', $MaxDropDownTextField);
 		// TODO: FOR ARRAY DATASET NEED TO
-		if(is_numeric($MaxTextLength) && $MaxTextLength > 0 && is_object($DataSet)){
-			$TextField = ArrayValueI('TextField', $Attributes, 'text');
-			$TestValue = GetValue($TextField, $DataSet->FirstRow());
-			if($TestValue !== False){
-				foreach($DataSet as $Data){
+		if (is_numeric($MaxTextLength) && $MaxTextLength > 0) {
+			if (is_object($DataSet)) {
+				$TextField = ArrayValueI('TextField', $Attributes, 'text');
+				$TestValue = GetValue($TextField, $DataSet->FirstRow());
+				if($TestValue !== False) foreach($DataSet as $Data) {
 					$Data->$TextField = SliceString($Data->$TextField, $MaxTextLength);
 				}
-			}			
-		} elseif(is_array($DataSet)) {
-			foreach($DataSet as &$Value) {
-				$Value = SliceString($Value, $MaxTextLength);
+			} elseif(is_array($DataSet)) {
+				foreach($DataSet as &$Value) {
+					$Value = SliceString($Value, $MaxTextLength);
+				}
 			}
 		}
 		return parent::DropDown($FieldName, $DataSet, $Attributes);
