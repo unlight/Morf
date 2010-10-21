@@ -5,7 +5,7 @@ $(document).ready(function(){
 	var i = document.createElement("input");
 	var Inputs = {
 		"date": {ifFormat: "%Y-%m-%d"},
-		"datetime": {ifFormat: "%Y-%m-%d %H:%M", showsTime: true},
+		"datetime": {ifFormat: "%Y-%m-%d %H:%M", showsTime: true}
 	};
 
 	function SetInputs(){
