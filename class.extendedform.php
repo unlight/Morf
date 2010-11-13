@@ -66,8 +66,9 @@ class MorfForm extends Gdn_Form {
 			if (is_object($DataSet)) {
 				$TextField = ArrayValueI('TextField', $Attributes, 'text');
 				$TestValue = GetValue($TextField, $DataSet->FirstRow());
-				if($TestValue !== False) foreach($DataSet as $Data) {
-					$Data->$TextField = SliceString($Data->$TextField, $MaxTextLength);
+				if($TestValue !== False) foreach($DataSet->ResultObject() as $Data) {
+					$S = SliceString(GetValue($TextField, $Data), $MaxTextLength);
+					SetValue($TextField, $Data, $S);
 				}
 			} elseif(is_array($DataSet)) {
 				foreach($DataSet as &$Value) {
@@ -75,6 +76,7 @@ class MorfForm extends Gdn_Form {
 				}
 			}
 		}
+		//d();d($DataSet);
 		return parent::DropDown($FieldName, $DataSet, $Attributes);
 	}
 	
