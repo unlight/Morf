@@ -76,7 +76,6 @@ class MorfForm extends Gdn_Form {
 				}
 			}
 		}
-		//d();d($DataSet);
 		return parent::DropDown($FieldName, $DataSet, $Attributes);
 	}
 	
