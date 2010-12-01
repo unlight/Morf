@@ -35,9 +35,9 @@ $(document).ready(function() {
 				onload: function(rpe, xhr){
 					var self = this;
 					eval("var File = " + xhr.responseText);
-					//$(UploadBoxText).val(File.RelativePath);
+					$(UploadBoxText).val(File.RelativePath);
 					$('.noswfupload :input').first().bind('change', DoUpload);
-					//$(UploadBoxText).removeAttr('disabled');
+					$(UploadBoxText).removeAttr('disabled');
 				}
 			});
 		}
