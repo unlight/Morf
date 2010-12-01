@@ -1,6 +1,5 @@
 $(document).ready(function() {
 	var UploadBoxFile = $('input[name$=_UploadBoxFile]');
-	var Url = gdn.url('plugins/Morf/noswfupload/noswfupload.min.js');
 	if (UploadBoxFile.length == 0) return;
 	var UploadBoxText = $(UploadBoxFile).prev();
 	var NoSwfUploadFileReceiverURL = gdn.definition('NoSwfUploadFileReceiverURL', false);
@@ -9,7 +8,7 @@ $(document).ready(function() {
 
 	// TODO: Add by JS (or remove hidden)
 	$.getScript( gdn.url('plugins/Morf/sprintf.js') );
-	$.getScript(Url, function(){
+	$.getScript(gdn.url('plugins/Morf/noswfupload/noswfupload.min.js'), function(){
 		noswfupload.lang.removeFile = '';
 		var input = UploadBoxFile.get(0);
 		var wrap = noswfupload.wrap(input, 0);
@@ -36,9 +35,9 @@ $(document).ready(function() {
 				onload: function(rpe, xhr){
 					var self = this;
 					eval("var File = " + xhr.responseText);
-					$(UploadBoxText).val(File.RelativePath);
+					//$(UploadBoxText).val(File.RelativePath);
 					$('.noswfupload :input').first().bind('change', DoUpload);
-					$(UploadBoxText).removeAttr('disabled');
+					//$(UploadBoxText).removeAttr('disabled');
 				}
 			});
 		}

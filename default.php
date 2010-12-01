@@ -9,6 +9,7 @@ Some render improvements in form class.
 4) columned CheckBoxList().
 5) HTML5 form input attributes
 6) Allow strip long text values in dropdown menu
+7) UploadBox() method. AJAX uploader.
 
 USAGE:
 // HTML5 form input attributes
