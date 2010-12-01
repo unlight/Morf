@@ -29,6 +29,8 @@ TODO:
 - settings / config
 
 CHANGELOG:
+1.5.0 (1 Dec 2010)
+[new] added uploadbox() method http://code.google.com/p/noswfupload
 1.4.2 (25 Sep 2010)
 [fix] fixed js load of jscalendar
 1.4.1 (22 Sep 2010)
@@ -59,8 +61,8 @@ CHANGELOG:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.4.4',
-	'Date' => '03 Nov 2010',
+	'Version' => '1.5.0',
+	'Date' => '1 Dec 2010',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
 	'License' => 'Liandri License'
