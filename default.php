@@ -114,11 +114,10 @@ class MorfPlugin extends Gdn_Plugin {
 			$TmpFile = $_FILES[$InputName]['tmp_name'];
 			if (move_uploaded_file($TmpFile, $File->TargetFile) || copy($TmpFile, $File->TargetFile)) {
 				if (file_exists($TmpFile)) unlink($TmpFile);
-					echo json_encode($File);
+				echo json_encode($File);
 			}
 		} catch (Exception $Ex) { // if something was wrong ... should generate onerror event
-			//$Sender->RenderException($Ex);
-			throw $Ex;
+			$Sender->RenderException($Ex);
 		}
 	}
 	

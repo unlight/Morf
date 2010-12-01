@@ -11,7 +11,7 @@ $(document).ready(function() {
 	$.getScript(Url, function(){
 		noswfupload.lang.removeFile = '';
 		var input = UploadBox.get(0);
-		var wrap = noswfupload.wrap(input, 1024 * 1024);
+		var wrap = noswfupload.wrap(input, -1);
 		function DoUpload(){
 			var file = wrap.files.shift();
 			wrap.files = [file];
