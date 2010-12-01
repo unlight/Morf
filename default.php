@@ -81,6 +81,47 @@ class MorfPlugin extends Gdn_Plugin {
 		$Sender->Render();
 	}
 	
+
+	public static function GenerateCleanTargetName($InputName, $TargetFolder = False, $Property = False) {
+		if (!$TargetFolder) $TargetFolder = CombinePaths(array(PATH_UPLOADS, date('Y')));
+		if (!is_dir($TargetFolder)) mkdir($TargetFolder, 0777, True);
+		$BaseName = $_FILES[$InputName]['name']; // file.ext
+		$TmpFile = $_FILES[$InputName]['tmp_name'];
+		$FileName = Gdn_Format::Clean(pathinfo($BaseName, 8)); // file
+		$Extension = Gdn_Format::Clean(pathinfo($BaseName, 4)); // ext
+		$Count = 0;
+		$RandSuffix = '';
+		do {
+			if ($Count > 0) $RandSuffix = '-' . strtolower(RandomString(rand(1,3)));
+			$TargetFile = $TargetFolder . '/' . $FileName . $RandSuffix . '.' . $Extension;
+			if (++$Count > 250) throw new Exception('Cannot generate unique name for file.');
+		} while (file_exists($TargetFile));			
+		$TargetFile = realpath($TargetFile);
+		if ($TargetFile == False) return False;
+		$Result = new StdClass();
+		$Result->TargetFile = $TargetFile;
+		$Result->RelativePath = substr($TargetFile, strlen(PATH_ROOT)+1);
+		$Result->WithDomain = Asset($Result->RelativePath, True);
+		if ($Property !== False) $Result = GetValue($Property, $Result);
+		return $Result;
+	}
+	
+	public function PluginController_NoSwfUploadFileFileReceiver_Create($Sender) {
+		if (isset($_GET['AjaxUploadFrame'])) return;
+		require dirname(__FILE__).'/noswfupload/noswfupload.php';
+		$InputName = ArrayValue(0, array_keys($_FILES));
+		if ($InputName == False ) { // if something was wrong ... should generate onerror event
+			header('HTTP/1.1 500 Internal Server Error');
+			return;
+		}
+		$File = self::GenerateCleanTargetName($InputName, False);
+		$TmpFile = $_FILES[$InputName]['tmp_name'];
+		if (move_uploaded_file($TmpFile, $File->TargetFile) || copy($TmpFile, $File->TargetFile)) {
+			if (file_exists($TmpFile)) unlink($TmpFile);
+				echo json_encode($File);
+		}
+	}
+	
 	public function Base_Render_Before(&$Sender) {
 		if(property_exists($Sender, 'Form') == False) return;
 		$Sender->AddCssFile('plugins/Morf/morf.css');
@@ -89,6 +130,8 @@ class MorfPlugin extends Gdn_Plugin {
 		
 		$Sender->AddJsFile($WebRootPlugin.'inputdatetime.js');
 		$Sender->AddJsFile($WebRootPlugin.'jquery.placeheld.js');
+		$Sender->AddJsFile($WebRootPlugin.'uploadbox.js');
+		
 		
 		$Language = ArrayValue(0, explode('-', Gdn::Locale()->Current()));
 		foreach(array($Language, 'en') as $Language){

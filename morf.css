@@ -70,3 +70,39 @@ select.Day{
 	width:25%;
 	max-width:25%;
 }*/
+
+
+/* ===================================================================== noswfupload */
+
+.noswfupload {
+	display: inline;
+}
+
+.noswfupload > ul {
+	margin:0 !important;
+	border:0 !important;
+	padding:0 !important;
+	margin-top: 10px !important;
+	
+	display:none;
+}
+
+.noswfupload > ul > li {
+	display: inline;
+	margin-left:10px;
+}
+.noswfupload > ul > li:first-child {
+	margin-left:0px;
+}
+
+
+
+
+
+
+
+
+
+
+
+

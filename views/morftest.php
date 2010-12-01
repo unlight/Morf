@@ -14,7 +14,12 @@ echo $this->Form->UploadBox('File');
 ?>
 
 </li>
-
+<li>
+<?php 
+	echo $this->Form->Label('Result', 'MyResult');
+	echo $this->Form->TextBox('MyResult', array('value' => 1));
+?>
+</li>
 	
 </ul>
 <?php echo $this->Form->Button('Upload') ?>

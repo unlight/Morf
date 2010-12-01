@@ -4,9 +4,9 @@ class MorfForm extends Gdn_Form {
 	
 	public function UploadBox($FieldName, $Attributes = False) {
 		$InputAttributes = array('size' => 1);
-		if (GetValue('multiple', $Attributes, False, True)) $InputAttributes['multiple'] = 'multiple';
+		//if (GetValue('multiple', $Attributes, False, True)) $InputAttributes['multiple'] = 'multiple';
 		$Result = $this->TextBox($FieldName, $Attributes);
-		$Result .= ' '.$this->Input($FieldName, 'file', $InputAttributes);
+		$Result .= ' '.$this->Input($FieldName.'_UploadBoxFile', 'file', $InputAttributes);
 		return $Result;
 	}
 	
