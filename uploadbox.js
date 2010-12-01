@@ -1,10 +1,9 @@
 $(document).ready(function() {
-	var UploadBoxFile = $('input[name$=_UploadBoxFile]');
+	var UploadBoxFile = $('input[name$=UploadBoxFile]');
 	if (UploadBoxFile.length == 0) return;
-	var UploadBoxText = $(UploadBoxFile).prev();
-	var NoSwfUploadFileReceiverURL = gdn.definition('NoSwfUploadFileReceiverURL', false);
-	if (!NoSwfUploadFileReceiverURL) NoSwfUploadFileReceiverURL = gdn.url('plugin/noswfuploadfilefilereceiver');
-	NoSwfUploadFileReceiverURL += '?DeliveryType=BOOL&DeliveryMethod=JSON';
+	var UploadBoxText = $(UploadBoxFile).parents('li').find('.InputBox').first();
+	var Form = $(UploadBoxFile).parents('form').first();
+	var ReceiveUploadFileURL = gdn.url('plugin/receiveuploadfile');
 
 	// TODO: Add by JS (or remove hidden)
 	$.getScript( gdn.url('plugins/Morf/sprintf.js') );
@@ -16,7 +15,7 @@ $(document).ready(function() {
 			var file = wrap.files.shift();
 			wrap.files = [file];
 			wrap.upload({
-				url: NoSwfUploadFileReceiverURL,
+				url: ReceiveUploadFileURL + '?' + $(Form).serialize() + '&DeliveryType=BOOL&DeliveryMethod=JSON',
 				onerror: function(){
 					gdn.inform("WARNING: Unable to upload " + this.file.fileName, true);
 				},
@@ -35,6 +34,7 @@ $(document).ready(function() {
 				onload: function(rpe, xhr){
 					var self = this;
 					eval("var File = " + xhr.responseText);
+					//console.log(File);
 					$(UploadBoxText).val(File.RelativePath);
 					$('.noswfupload :input').first().bind('change', DoUpload);
 					$(UploadBoxText).removeAttr('disabled');

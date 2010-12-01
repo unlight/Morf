@@ -4,14 +4,16 @@ class MorfForm extends Gdn_Form {
 	
 	public function UploadBox($FieldName, $Attributes = False) {
 		$Result = '';
-		$InputAttributes = array('size' => 1);
-		if ($UploadTo = GetValue('To', $Attributes, False, True)) {
-			if (!is_dir($UploadTo) || !is_writable($UploadTo))
-				throw new Exception(sprintf("'%s' is not (writable) valid directory.", $UploadTo));
-			$Result .= $this->Hidden($FieldName.'_UploadToDirectory', array('value' => $UploadTo));
-		}
+		$UploadTo = GetValue('UploadTo', $Attributes, False, True);
 		$Result .= $this->TextBox($FieldName, $Attributes);
-		$Result .= ' '.$this->Input($FieldName.'_UploadBoxFile', 'file', $InputAttributes);
+		if (CheckPermission('Plugins.Morf.Upload')) {
+			$InputAttributes = array('size' => 1);
+			if ($UploadTo) {
+				if (!GetValue($FieldName.'UploadTo', $this->HiddenInputs))
+					$Result .= $this->Hidden($FieldName.'UploadTo', array('value' => $UploadTo));
+			}
+			$Result .= ' '.$this->Input($FieldName.'UploadBoxFile', 'file', $InputAttributes);
+		}
 		return $Result;
 	}
 	
@@ -29,20 +31,20 @@ class MorfForm extends Gdn_Form {
 	
 	public $bMultipart = False;
 	
-	public function SetMultipart($Bool = True){
+	public function SetMultipart($Bool = True) {
 		$this->bMultipart = ForceBool($Bool);
 	}
 	
-	public function Open($Attributes = False){
+	public function Open($Attributes = False) {
 		if($this->bMultipart) $Attributes['enctype'] = 'multipart/form-data';
 		return parent::Open($Attributes);
 	}
 	
-	public function ClearErrors(){
+	public function ClearErrors() {
 		$this->_ValidationResults = array();
 	}
 	
-	public function Errors(){
+	public function Errors() {
 		if(!(is_array($this->_ValidationResults) && count($this->_ValidationResults) > 0)) return '';
 		$Return = '';
 		foreach($this->_ValidationResults as $FieldName => $Problems){

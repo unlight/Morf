@@ -62,8 +62,9 @@ CHANGELOG:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.5.1',
-	'Date' => '1 Dec 2010',
+	'RegisterPermissions' => array('Plugins.Morf.Upload'),
+	'Version' => '1.6.0',
+	'Date' => '2 Dec 2010',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
 	'License' => 'Liandri License'
@@ -85,7 +86,12 @@ class MorfPlugin extends Gdn_Plugin {
 	}
 
 	public static function GenerateCleanTargetName($InputName, $TargetFolder = False, $Property = False) {
-		if (!$TargetFolder) $TargetFolder = CombinePaths(array(PATH_UPLOADS, date('Y')));
+		if ($TargetFolder) {
+			$TargetFolder = str_replace('..', '', $TargetFolder);
+			$TargetFolder = trim($TargetFolder, '/\\');
+		}
+		if (!$TargetFolder) $TargetFolder = date('Y');
+		$TargetFolder = CombinePaths(array(PATH_UPLOADS, $TargetFolder));
 		if (!is_dir($TargetFolder)) mkdir($TargetFolder, 0777, True);
 		$BaseName = $_FILES[$InputName]['name']; // file.ext
 		$TmpFile = $_FILES[$InputName]['tmp_name'];
@@ -126,13 +132,30 @@ class MorfPlugin extends Gdn_Plugin {
 		}
 	}
 	
-	public function PluginController_NoSwfUploadFileFileReceiver_Create($Sender) {
+	// TODO: Rename
+	public function PluginController_ReceiveUploadFile_Create($Sender) {
+		// TODO: Maybe check by $Session->GetAttribute()
 		$Session = Gdn::Session();
-		if (!$Session->IsValid()) {
-			$Ex = new Exception('Session is not valid.', 500);
-			return $Sender->RenderException($Ex);
+		$Ex = False;
+		if (!$Session->IsValid()) 
+			$Ex = new Exception('Permission problem.', 500);
+		elseif (!$Session->CheckPermission('Plugins.Morf.Upload')) 
+			$Ex = new Exception('Permission problem.', 500);
+		if ($Ex != False) return $Sender->RenderException($Ex);
+		
+		$InputName = ArrayValue(0, array_keys($_FILES));
+		$UploadToName = substr($InputName, 0, -strlen('UploadBoxFile')) . 'UploadTo';
+		
+		$DirectoryFound = False;
+		if ($InputName && $UploadToName) foreach($_GET as $UploadToKey => $Directory) {
+			if (preg_match('/'.$UploadToName.'$/', $UploadToKey)) {
+				$DirectoryFound = True;
+				break;
+			}
 		}
-		self::Upload($Sender, False);
+		if ($DirectoryFound == False) $Directory = False;
+		
+		self::Upload($Sender, $Directory);
 	}
 	
 	public function Base_Render_Before(&$Sender) {

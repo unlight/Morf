@@ -2,7 +2,10 @@
 
 <h1><?php echo Gdn::Translate('Upload File') ?></h1>
 
-<?php echo $this->Form->Open(array('enctype' => 'multipart/form-data')) ?>
+<?php 
+
+//$this->Form->AddHidden('FileUploadTo', 'test');
+echo $this->Form->Open(array('enctype' => 'multipart/form-data')) ?>
 <?php echo $this->Form->Errors() ?>
 
 <ul class="LoadUpForm">
@@ -10,7 +13,8 @@
 
 <li>
 <?php echo $this->Form->Label('Choose file', 'File');
-echo $this->Form->UploadBox('File', array('To' => 'uploads/salesoutlet/exhibition'));
+// array('To' => 'uploads/salesoutlet/exhibition')
+echo $this->Form->UploadBox('File', array('UploadTo' => '/test'));
 ?>
 
 </li>
