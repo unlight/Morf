@@ -80,7 +80,6 @@ class MorfPlugin extends Gdn_Plugin {
 		$Sender->View = $this->GetView('morftest.php');
 		$Sender->Render();
 	}
-	
 
 	public static function GenerateCleanTargetName($InputName, $TargetFolder = False, $Property = False) {
 		if (!$TargetFolder) $TargetFolder = CombinePaths(array(PATH_UPLOADS, date('Y')));
@@ -104,21 +103,26 @@ class MorfPlugin extends Gdn_Plugin {
 		return $Result;
 	}
 	
-	public function PluginController_NoSwfUploadFileFileReceiver_Create($Sender) {
+	// No swf upload
+	public static function Upload($Controller, $TargetFolder) {
 		if (isset($_GET['AjaxUploadFrame'])) return;
 		require dirname(__FILE__).'/noswfupload/noswfupload.php';
 		$InputName = ArrayValue(0, array_keys($_FILES));
 		try {
 			if ($InputName == False ) throw new Exception('No files.', 500);
-			$File = self::GenerateCleanTargetName($InputName, False);
+			$File = self::GenerateCleanTargetName($InputName, $TargetFolder);
 			$TmpFile = $_FILES[$InputName]['tmp_name'];
 			if (move_uploaded_file($TmpFile, $File->TargetFile) || copy($TmpFile, $File->TargetFile)) {
 				if (file_exists($TmpFile)) unlink($TmpFile);
 				echo json_encode($File);
 			}
 		} catch (Exception $Ex) { // if something was wrong ... should generate onerror event
-			$Sender->RenderException($Ex);
+			$Controller->RenderException($Ex);
 		}
+	}
+	
+	public function PluginController_NoSwfUploadFileFileReceiver_Create($Sender) {
+		self::Upload($Sender, False);
 	}
 	
 	public function Base_Render_Before(&$Sender) {
