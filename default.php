@@ -95,9 +95,7 @@ class MorfPlugin extends Gdn_Plugin {
 			if ($Count > 0) $RandSuffix = '-' . strtolower(RandomString(rand(1,3)));
 			$TargetFile = $TargetFolder . '/' . $FileName . $RandSuffix . '.' . $Extension;
 			if (++$Count > 250) throw new Exception('Cannot generate unique name for file.');
-		} while (file_exists($TargetFile));			
-		$TargetFile = realpath($TargetFile);
-		if ($TargetFile == False) return False;
+		} while (file_exists($TargetFile));
 		$Result = new StdClass();
 		$Result->TargetFile = $TargetFile;
 		$Result->RelativePath = substr($TargetFile, strlen(PATH_ROOT)+1);
@@ -110,15 +108,17 @@ class MorfPlugin extends Gdn_Plugin {
 		if (isset($_GET['AjaxUploadFrame'])) return;
 		require dirname(__FILE__).'/noswfupload/noswfupload.php';
 		$InputName = ArrayValue(0, array_keys($_FILES));
-		if ($InputName == False ) { // if something was wrong ... should generate onerror event
-			header('HTTP/1.1 500 Internal Server Error');
-			return;
-		}
-		$File = self::GenerateCleanTargetName($InputName, False);
-		$TmpFile = $_FILES[$InputName]['tmp_name'];
-		if (move_uploaded_file($TmpFile, $File->TargetFile) || copy($TmpFile, $File->TargetFile)) {
-			if (file_exists($TmpFile)) unlink($TmpFile);
-				echo json_encode($File);
+		try {
+			if ($InputName == False ) throw new Exception('No files.', 500);
+			$File = self::GenerateCleanTargetName($InputName, False);
+			$TmpFile = $_FILES[$InputName]['tmp_name'];
+			if (move_uploaded_file($TmpFile, $File->TargetFile) || copy($TmpFile, $File->TargetFile)) {
+				if (file_exists($TmpFile)) unlink($TmpFile);
+					echo json_encode($File);
+			}
+		} catch (Exception $Ex) { // if something was wrong ... should generate onerror event
+			//$Sender->RenderException($Ex);
+			throw $Ex;
 		}
 	}
 	
