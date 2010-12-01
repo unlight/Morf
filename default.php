@@ -75,6 +75,12 @@ unset($tmp);
 // morf ~ form ()
 class MorfPlugin extends Gdn_Plugin {
 	
+	public function PluginController_MorfTest_Create($Sender) {
+		$Sender->Form = Gdn::Factory('Form');
+		$Sender->View = $this->GetView('morftest.php');
+		$Sender->Render();
+	}
+	
 	public function Base_Render_Before(&$Sender) {
 		if(property_exists($Sender, 'Form') == False) return;
 		$Sender->AddCssFile('plugins/Morf/morf.css');
