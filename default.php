@@ -151,6 +151,7 @@ class MorfPlugin extends Gdn_Plugin {
 	
 	
 	public function Setup() {
+		// Nothing to do
 	}
 	
 }
