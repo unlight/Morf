@@ -112,10 +112,11 @@ class MorfPlugin extends Gdn_Plugin {
 		if (isset($_GET['AjaxUploadFrame'])) return;
 		require dirname(__FILE__).'/noswfupload/noswfupload.php';
 		$InputName = ArrayValue(0, array_keys($_FILES));
+		$Upload = new Gdn_Upload();
 		try {
 			if ($InputName == False ) throw new Exception('No files.', 500);
+			$TmpFile = $Upload->ValidateUpload($InputName, True);
 			$File = self::GenerateCleanTargetName($InputName, $TargetFolder);
-			$TmpFile = $_FILES[$InputName]['tmp_name'];
 			if (move_uploaded_file($TmpFile, $File->TargetFile) || copy($TmpFile, $File->TargetFile)) {
 				if (file_exists($TmpFile)) unlink($TmpFile);
 				echo json_encode($File);
@@ -126,6 +127,11 @@ class MorfPlugin extends Gdn_Plugin {
 	}
 	
 	public function PluginController_NoSwfUploadFileFileReceiver_Create($Sender) {
+		$Session = Gdn::Session();
+		if (!$Session->IsValid()) {
+			$Ex = new Exception('Not logged in.', 500);
+			return $Sender->RenderException($Ex);
+		}
 		self::Upload($Sender, False);
 	}
 	
