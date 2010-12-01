@@ -129,7 +129,7 @@ class MorfPlugin extends Gdn_Plugin {
 	public function PluginController_NoSwfUploadFileFileReceiver_Create($Sender) {
 		$Session = Gdn::Session();
 		if (!$Session->IsValid()) {
-			$Ex = new Exception('Not logged in.', 500);
+			$Ex = new Exception('Session is not valid.', 500);
 			return $Sender->RenderException($Ex);
 		}
 		self::Upload($Sender, False);

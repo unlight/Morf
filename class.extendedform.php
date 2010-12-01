@@ -3,9 +3,14 @@
 class MorfForm extends Gdn_Form {
 	
 	public function UploadBox($FieldName, $Attributes = False) {
+		$Result = '';
 		$InputAttributes = array('size' => 1);
-		//if (GetValue('multiple', $Attributes, False, True)) $InputAttributes['multiple'] = 'multiple';
-		$Result = $this->TextBox($FieldName, $Attributes);
+		if ($UploadTo = GetValue('To', $Attributes, False, True)) {
+			if (!is_dir($UploadTo) || !is_writable($UploadTo))
+				throw new Exception(sprintf("'%s' is not (writable) valid directory.", $UploadTo));
+			$Result .= $this->Hidden($FieldName.'_UploadToDirectory', array('value' => $UploadTo));
+		}
+		$Result .= $this->TextBox($FieldName, $Attributes);
 		$Result .= ' '.$this->Input($FieldName.'_UploadBoxFile', 'file', $InputAttributes);
 		return $Result;
 	}

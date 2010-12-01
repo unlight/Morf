@@ -10,7 +10,7 @@
 
 <li>
 <?php echo $this->Form->Label('Choose file', 'File');
-echo $this->Form->UploadBox('File');
+echo $this->Form->UploadBox('File', array('To' => 'uploads/salesoutlet/exhibition'));
 ?>
 
 </li>
