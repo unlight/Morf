@@ -88,13 +88,14 @@ class MorfPlugin extends Gdn_Plugin {
 		$TmpFile = $_FILES[$InputName]['tmp_name'];
 		$FileName = Gdn_Format::Clean(pathinfo($BaseName, 8)); // file
 		$Extension = Gdn_Format::Clean(pathinfo($BaseName, 4)); // ext
-		$Count = 0;
-		$RandSuffix = '';
+		$Count = 0; $RandSuffix = '';
 		do {
-			if ($Count > 0) $RandSuffix = '-' . strtolower(RandomString(rand(1,3)));
-			$TargetFile = $TargetFolder . '/' . $FileName . $RandSuffix . '.' . $Extension;
 			if (++$Count > 250) throw new Exception('Cannot generate unique name for file.');
-		} while (file_exists($TargetFile));
+			$TargetFile = $TargetFolder . '/' . $FileName . $RandSuffix . '.' . $Extension;
+			$FileExists = file_exists($TargetFile);
+			if ($FileExists && md5_file($TargetFile) == md5_file($TmpFile)) break;
+			$RandSuffix = '-' . strtolower(RandomString(rand(1,3)));
+		} while ($FileExists);
 		$Result = new StdClass();
 		$Result->TargetFile = $TargetFile;
 		$Result->RelativePath = substr($TargetFile, strlen(PATH_ROOT)+1);
