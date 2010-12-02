@@ -62,8 +62,8 @@ CHANGELOG:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'RegisterPermissions' => array('Plugins.Morf.Upload'),
-	'Version' => '1.6.0',
+	'RegisterPermissions' => array('Plugins.Morf.Upload.Allow'),
+	'Version' => '1.6.1',
 	'Date' => '2 Dec 2010',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
@@ -139,7 +139,7 @@ class MorfPlugin extends Gdn_Plugin {
 		$Ex = False;
 		if (!$Session->IsValid()) 
 			$Ex = new Exception('Permission problem.', 500);
-		elseif (!$Session->CheckPermission('Plugins.Morf.Upload')) 
+		elseif (!$Session->CheckPermission('Plugins.Morf.Upload.Allow')) 
 			$Ex = new Exception('Permission problem.', 500);
 		if ($Ex != False) return $Sender->RenderException($Ex);
 		
@@ -177,14 +177,13 @@ class MorfPlugin extends Gdn_Plugin {
 				break;
 			}
 		}
-	
-
 	}
-	
 	
 	public function Setup() {
 		// Nothing to do
 	}
+	
+	
 	
 }
 

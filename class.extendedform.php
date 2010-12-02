@@ -6,7 +6,7 @@ class MorfForm extends Gdn_Form {
 		$Result = '';
 		$UploadTo = GetValue('UploadTo', $Attributes, False, True);
 		$Result .= $this->TextBox($FieldName, $Attributes);
-		if (CheckPermission('Plugins.Morf.Upload')) {
+		if (CheckPermission('Plugins.Morf.Upload.Allow')) {
 			$InputAttributes = array('size' => 1);
 			if ($UploadTo) {
 				if (!GetValue($FieldName.'UploadTo', $this->HiddenInputs))
