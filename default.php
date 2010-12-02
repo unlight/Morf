@@ -30,8 +30,9 @@ TODO:
 - settings / config
 
 CHANGELOG:
-1.6.1 (2 Dec 2010)
+1.6 (2 Dec 2010)
 [add] permission to use uploadbox
+[add] fixed uploadbox for popup windows
 1.5.0 (1 Dec 2010)
 [new] added uploadbox() method http://code.google.com/p/noswfupload
 1.4.2 (25 Sep 2010)
@@ -64,7 +65,7 @@ CHANGELOG:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.6.2',
+	'Version' => '1.6.3',
 	'Date' => '2 Dec 2010',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
