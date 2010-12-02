@@ -30,7 +30,7 @@ TODO:
 - settings / config
 
 CHANGELOG:
-1.6 (2 Dec 2010)
+1.6 (3 Dec 2010)
 [add] permission to use uploadbox
 [add] fixed uploadbox for popup windows
 [fix] multiple uploadbox inputs

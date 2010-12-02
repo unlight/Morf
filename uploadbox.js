@@ -37,7 +37,8 @@ $(document).ready(function() {
 					var self = this;
 					eval("var File = " + xhr.responseText);
 					$(UploadBoxText).val(File.RelativePath);
-					var InputB = $(UploadBoxText).next().find('input[type=file]').first();
+					var InputB = $(UploadBoxText).parent().find('.noswfupload > input[type=file]').first();
+					//console.log(InputB, UploadBoxText);
 					$(InputB).bind('change', DoUpload);
 					$(UploadBoxText).removeAttr('disabled');
 				}
