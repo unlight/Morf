@@ -30,6 +30,8 @@ TODO:
 - settings / config
 
 CHANGELOG:
+1.6.1 (2 Dec 2010)
+[add] permission to use uploadbox
 1.5.0 (1 Dec 2010)
 [new] added uploadbox() method http://code.google.com/p/noswfupload
 1.4.2 (25 Sep 2010)
@@ -62,12 +64,12 @@ CHANGELOG:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'RegisterPermissions' => array('Plugins.Morf.Upload.Allow'),
-	'Version' => '1.6.1',
+	'Version' => '1.6.2',
 	'Date' => '2 Dec 2010',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
-	'License' => 'Liandri License'
+	'License' => 'Liandri License',
+	'RegisterPermissions' => array('Plugins.Morf.Upload.Allow')
 );
 
 $tmp = Gdn::FactoryOverwrite(True);
@@ -75,15 +77,14 @@ Gdn::FactoryInstall('Form', 'MorfForm', dirname(__FILE__) . DS. 'class.extendedf
 Gdn::FactoryOverwrite($tmp);
 unset($tmp);
 
-
 // morf ~ form ()
 class MorfPlugin extends Gdn_Plugin {
 	
-	public function PluginController_MorfTest_Create($Sender) {
+/*	public function PluginController_MorfTest_Create($Sender) {
 		$Sender->Form = Gdn::Factory('Form');
 		$Sender->View = $this->GetView('morftest.php');
 		$Sender->Render();
-	}
+	}*/
 
 	public static function GenerateCleanTargetName($InputName, $TargetFolder = False, $Property = False) {
 		if ($TargetFolder) {
@@ -179,8 +180,22 @@ class MorfPlugin extends Gdn_Plugin {
 		}
 	}
 	
+	// plugin/reenablemorf
+	public function PluginController_ReEnableMorf_Create($Sender) {
+		$Sender->Permission('Garden.Admin.Only');
+		$Session = Gdn::Session();
+		$TransientKey = $Session->TransientKey();
+		RemoveFromConfig('EnabledPlugins.Morf');
+		Redirect('settings/plugins/all/Morf/'.$TransientKey);
+	}
+	
+	public function Structure() {
+		$PermissionModel = Gdn::PermissionModel();
+		$PermissionModel->Define('Plugins.Morf.Upload.Allow');
+	}
+	
 	public function Setup() {
-		// Nothing to do
+		$this->Structure();
 	}
 	
 	
