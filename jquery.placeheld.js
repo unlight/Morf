@@ -1,7 +1,3 @@
-$(document).ready(function(){ // launched by me
-	$("input[placeholder]").placeHeld();
-});
-
 // PlaceHeld jQuery plugin by [Max Wheeler](max@makenosound.com)
 // 
 // Copyright (c) 2010 Max Wheeler. Licensed under the [WTFPL](http://sam.zoy.org/wtfpl/)

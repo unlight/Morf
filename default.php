@@ -66,8 +66,8 @@ CHANGELOG:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.6.5',
-	'Date' => '3 Dec 2010',
+	'Version' => '1.6.6',
+	'Date' => '23 Dec 2010',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
 	'License' => 'Liandri License',
@@ -166,10 +166,10 @@ class MorfPlugin extends Gdn_Plugin {
 		$Sender->AddCssFile('plugins/Morf/morf.css');
 		$WebRootPlugin = Gdn_Plugin::GetWebResource('');
 		$Sender->AddDefinition('JsDateTime', $WebRootPlugin . 'jquery.dynDateTime/');
-		
-		$Sender->AddJsFile($WebRootPlugin.'inputdatetime.js');
-		$Sender->AddJsFile($WebRootPlugin.'jquery.placeheld.js');
-		$Sender->AddJsFile($WebRootPlugin.'uploadbox.js');
+
+		$Sender->AddJsFile($WebRootPlugin.'jquery.placeheld.js');		
+		$Sender->AddJsFile($WebRootPlugin.'morf.js');
+		//$Sender->AddJsFile($WebRootPlugin.'uploadbox.js');
 		
 		
 		$Language = ArrayValue(0, explode('-', Gdn::Locale()->Current()));
