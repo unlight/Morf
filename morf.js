@@ -121,5 +121,3 @@ $(document).ready(function(){
 	if (typeof($.placeHeld) == 'function') $("input[placeholder]").placeHeld();
 	
 });
-	
-});
