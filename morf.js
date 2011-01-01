@@ -33,10 +33,10 @@ $(document).ready(function(){
 		if(JsDateTimeLoading) return;
 		JsDateTimeLoading = true;
 		var jsdatetime = gdn.definition('JsDateTime');
-		$('head').append('<link rel="stylesheet" type="text/css" href="'+jsdatetime + 'skins/aqua/theme.css" media="screen" />');
-		//$.getScript(jsdatetime + 'jquery.dynDateTime.js');
-		$.getScript(jsdatetime + 'jquery.dynDateTime.pack.js');
-		$.getScript(gdn.definition('JsDateTimeLanguage'), SetInputs);
+		$('head').append('<link rel="stylesheet" type="text/css" href="'+jsdatetime + '/skins/aqua/theme.css" media="screen" />');
+		$.getScript(jsdatetime + '/jquery.dynDateTime.pack.js');
+		var LangFile = jsdatetime + '/lang/' + gdn.definition('JsDateTimeLanguage');
+		$.getScript(LangFile, SetInputs);
 	}
 	
 	SetInputs();

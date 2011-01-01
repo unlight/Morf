@@ -66,8 +66,8 @@ CHANGELOG:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.6.6',
-	'Date' => '23 Dec 2010',
+	'Version' => '1.6.7',
+	'Date' => '1 Jan 2010',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
 	'License' => 'Liandri License',
@@ -162,21 +162,19 @@ class MorfPlugin extends Gdn_Plugin {
 	}
 	
 	public function Base_Render_Before(&$Sender) {
-		if(property_exists($Sender, 'Form') == False) return;
+		if (property_exists($Sender, 'Form') == False) return;
 		$Sender->AddCssFile('plugins/Morf/morf.css');
-		$WebRootPlugin = Gdn_Plugin::GetWebResource('');
-		$Sender->AddDefinition('JsDateTime', $WebRootPlugin . 'jquery.dynDateTime/');
-
-		$Sender->AddJsFile($WebRootPlugin.'jquery.placeheld.js');		
-		$Sender->AddJsFile($WebRootPlugin.'morf.js');
-		//$Sender->AddJsFile($WebRootPlugin.'uploadbox.js');
+		$Sender->AddJsFile('plugins/Morf/jquery.placeheld.js');		
+		$Sender->AddJsFile('plugins/Morf/morf.js');
 		
+		$DateWebRootPlugin = Gdn_Plugin::GetWebResource('jquery.dynDateTime');
+		$Sender->AddDefinition('JsDateTime', $DateWebRootPlugin);
 		
 		$Language = ArrayValue(0, explode('-', Gdn::Locale()->Current()));
 		foreach(array($Language, 'en') as $Language){
 			$LanguageJsFile = 'jquery.dynDateTime/lang/calendar-'.$Language.'.js';
 			if(file_exists(Gdn_Plugin::GetResource($LanguageJsFile))){
-				$Sender->AddDefinition('JsDateTimeLanguage', $WebRootPlugin.$LanguageJsFile);
+				$Sender->AddDefinition('JsDateTimeLanguage', 'calendar-'.$Language.'.js');
 				break;
 			}
 		}
