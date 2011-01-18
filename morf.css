@@ -77,12 +77,10 @@ select.Day{
 	-webkit-border-radius: 2px;
 	-moz-border-radius: 2px;
 	border-radius: 2px;
-	
-	background:url('select.gif') top left no-repeat;
 }
 
 .noswfupload input{
-	width: 60px;
+	width: 20px;
 }
 
 

@@ -66,8 +66,8 @@ CHANGELOG:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.6.9',
-	'Date' => '17 Jan 2010',
+	'Version' => '1.6.10',
+	'Date' => '18 Jan 2010',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
 	'License' => 'Liandri License',
@@ -131,7 +131,8 @@ class MorfPlugin extends Gdn_Plugin {
 				echo json_encode($File);
 			}
 		} catch (Exception $Ex) { // if something was wrong ... should generate onerror event
-			$Controller->RenderException($Ex);
+			$Exception = new Exception($Ex->GetMessage(), 500);
+			$Controller->RenderException($Exception);
 		}
 	}
 	

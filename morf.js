@@ -83,6 +83,9 @@ $(document).ready(function(){
 				onload: function(rpe, xhr){
 					var self = this;
 					eval("var File = " + xhr.responseText);
+					if (File.Exception !== undefined) {
+						gdn.inform(File.Exception, true);
+					}
 					$(UploadBoxText).val(File.RelativePath);
 					var InputB = $(UploadBoxText).parent().find('.noswfupload > input[type=file]').first();
 					//console.log(InputB, UploadBoxText);
