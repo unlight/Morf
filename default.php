@@ -66,8 +66,8 @@ CHANGELOG:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.6.7',
-	'Date' => '1 Jan 2010',
+	'Version' => '1.6.9',
+	'Date' => '17 Jan 2010',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
 	'License' => 'Liandri License',

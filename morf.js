@@ -54,6 +54,11 @@ $(document).ready(function(){
 		var wrap = noswfupload.wrap(input, 0);
 		var LocalInput = input;
 		var UploadBoxText = $(LocalInput).parents('li').find('.InputBox').first();
+		//var label = $(LocalInput).parents('li').find('label[for='+UploadBoxText.attr('id')+']');
+		//var up = $(LocalInput).parents('li').find('.noswfupload');
+		//$('<span>', {'class': 'ChooseFile', html:'&uarr;'}).insertAfter(LocalInput);
+		//$('<span>', {'class': 'ChooseFile'}).wrap(LocalInput);
+		//$('<span>', {'class': 'ChooseFile', html:'&uarr;'}).prependTo(up);
 		
 		function DoUpload(){
 			var file = wrap.files.shift();
@@ -103,6 +108,7 @@ $(document).ready(function(){
 		var InputFile = this;
 		if ($(InputFile).parents().is('.noswfupload')) return;
 		if (!Form) Form = $(InputFile).parents('form').first();
+		//console.log(InputFile);
 		
 		if (ScriptsLoading == false) {
 			ScriptsLoading = true;

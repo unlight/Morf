@@ -72,10 +72,25 @@ select.Day{
 }*/
 
 
+.noswfupload {
+	border:1px solid #ddd;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+	
+	background:url('select.gif') top left no-repeat;
+}
+
+.noswfupload input{
+	width: 60px;
+}
+
+
 /* ===================================================================== noswfupload */
 
-.noswfupload {
-	display: inline;
+.noswfupload,
+.noswfupload * {
+	display:inline;
 }
 
 .noswfupload > ul {
@@ -95,6 +110,13 @@ select.Day{
 	margin-left:0px;
 }
 
+.noswfupload input {
+	-moz-opacity: 0 !important;
+	-webkit-opacity: 0!important;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)" !important;
+	filter: alpha(opacity=0) !important;
+	opacity: 0 !important;
+}
 
 
 

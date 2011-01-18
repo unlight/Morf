@@ -7,12 +7,13 @@ class MorfForm extends Gdn_Form {
 		$UploadTo = GetValue('UploadTo', $Attributes, False, True);
 		$Result .= $this->TextBox($FieldName, $Attributes);
 		if (CheckPermission('Plugins.Morf.Upload.Allow')) {
-			$InputAttributes = array('size' => 1);
+			$InputAttributes = array('size' => 1, 'title' => T('Choose file'));
 			if ($UploadTo) {
 				if (!GetValue($FieldName.'UploadTo', $this->HiddenInputs))
 					$Result .= $this->Hidden($FieldName.'UploadTo', array('value' => $UploadTo));
 			}
 			$Result .= ' '.$this->Input($FieldName.'UploadBoxFile', 'file', $InputAttributes);
+			//$Result .= Wrap('&uarr;', 'span', array('class' => 'ChooseFile'));
 		}
 		return $Result;
 	}
