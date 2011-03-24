@@ -34,8 +34,8 @@ TODO:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.8.15',
-	'Date' => '18 Mar 2011',
+	'Version' => '1.9.16',
+	'Date' => '28 Mar 2011',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
 	'License' => 'Liandri License',
@@ -53,9 +53,6 @@ class MorfPlugin extends Gdn_Plugin {
 	public function PluginController_MorfTest_Create($Sender) {
 		$Sender->Form = Gdn::Factory('Form');
 		$Sender->View = $this->GetView('morftest.php');
-		
-		$Sender->AddJsFile('plugins/Morf/jquery.uploadify/jquery.uploadify.min.js');
-		
 		$Sender->Render();
 	}
 
@@ -89,8 +86,6 @@ class MorfPlugin extends Gdn_Plugin {
 	
 	// No swf upload
 	public static function Upload($Controller, $TargetFolder) {
-		if (isset($_GET['AjaxUploadFrame'])) return;
-		require dirname(__FILE__).'/noswfupload/noswfupload.php';
 		$InputName = ArrayValue(0, array_keys($_FILES));
 		$Upload = new Gdn_Upload();
 		try {
@@ -120,7 +115,6 @@ class MorfPlugin extends Gdn_Plugin {
 		
 		$InputName = ArrayValue(0, array_keys($_FILES));
 		$UploadToName = substr($InputName, 0, -strlen('UploadBoxFile')) . 'UploadTo';
-		
 		$DirectoryFound = False;
 		if ($InputName && $UploadToName) foreach($_GET as $UploadToKey => $Directory) {
 			if (preg_match('/'.$UploadToName.'$/', $UploadToKey)) {
@@ -128,25 +122,7 @@ class MorfPlugin extends Gdn_Plugin {
 				break;
 			}
 		}
-		if ($DirectoryFound == False) $Directory = False;
-		
-/*		$targetFolder = '/uploads/'.date('Y');
-		$tempFile = $_FILES['Filedata']['tmp_name'];
-		$targetPath = $_SERVER['DOCUMENT_ROOT'] . $targetFolder;
-		$targetFile = self::GenerateCleanTargetName('Filedata', $targetPath);
-		
-		// Validate the file type
-		$fileTypes = array('jpg','jpeg','gif','png'); // File extensions
-		$fileParts = pathinfo($_FILES['Filedata']['name']);
-		
-		if (in_array($fileParts['extension'],$fileTypes)) {
-			move_uploaded_file($tempFile,$targetFile);
-			echo '1';
-		} else {
-			echo 'Invalid file type.';
-		}
-		return;*/
-		
+		if ($DirectoryFound == False) $Directory = GetIncomingValue('UploadTo');
 		self::Upload($Sender, $Directory);
 	}
 	

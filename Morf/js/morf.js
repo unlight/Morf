@@ -53,22 +53,29 @@ $(document).ready(function(){
 		if ($(inputfile).data('loaded')) return;
 		$(inputfile).data('loaded', true);
 		var filter = $(inputfile).attr('id').replace('UploadBoxFile', '');
-		filter = 'input[id^="'+filter+'"]';
+		var inputtextbox = $('#'+filter)[0];
 		var form = $(inputfile).parents('form')[0];
-		var uploadto = $(form).find('input[name$=UploadTo]').val(); // TODO: fix uploadto var
-		$(form).fileUpload({
+		var uploadto = $('#'+filter+'UploadTo', form).val();
+		$(form).fileUploadUI({
 			namespace: 'FileUpload'+ Math.floor(Math.random() * 99999999),
-			fileInputFilter: filter,
+			fileInputFilter: 'input[id^="'+filter+'"]',
 			dragDropSupport: false,
 			initUpload: function(event, files, index, xhr, uploadSettings, Callback){
 				//console.log('initUpload', arguments);
+				$(inputtextbox).attr('disabled', 'disabled');
 				Callback();
 			},
+			onLoad: function(e, files, index, xhr, handler){
+				var file = handler.parseResponse(xhr);
+				$(inputtextbox).val(file.RelativePath);					
+				$(inputtextbox).removeAttr('disabled');
+			},
 			onProgress: function(event, files, index, xhr, handler){
-				//console.log(event, files, index, xhr, handler);
-				if (handler.progressbar) {
+				console.log(event, files, index, xhr, handler);
+				//alert([event, files, index, xhr, handler]);
+/*				if (handler.progressbar) {
 					handler.progressbar.progressbar('value', parseInt(event.loaded / event.total * 100, 10));
-				}
+				}*/
 			},
 			url: receivefileurl + '?UploadTo=' + uploadto + '&DeliveryType=BOOL&DeliveryMethod=JSON'
 		});
@@ -78,12 +85,11 @@ $(document).ready(function(){
 	var receivefileurl = gdn.url('plugin/receiveuploadfile');
 	var jsfiles = [];
 	jsfiles[jsfiles.length] = uploadwebroot+'/jquery.fileupload.js';
-	jsfiles[jsfiles.length] = 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js';
+	//jsfiles[jsfiles.length] = 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js';
 	jsfiles[jsfiles.length] = uploadwebroot+'/jquery.fileupload-ui.js';
 	LazyLoad.js(jsfiles, function(){
 		$('input[name$=UploadBoxFile]').livequery(init_upload_input);
 	});
-	
 
 	
 	
