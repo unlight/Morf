@@ -9,6 +9,8 @@
 // * v1.0.2 (2010-05-10) Removed default text from form submission; moved placeholder support check outside for() loop
 // * v1.0.3 (2010-05-14) Added check for "placheld" class before clearing default text on form submission
 
+// Fixed by S (27 Feb 2011): Added form-pre-serialize handler
+
 (function($){
 	$.placeHeld = function(el, options){
 		var base = this;
@@ -20,6 +22,7 @@
 		base.init = function(){
 			base.options = $.extend({},$.placeHeld.defaultOptions, options);
 			base.$el.bind('blur', base.holdPlace).bind('focus', base.releasePlace).trigger('blur');
+			base.$el.parents('form').bind('form-pre-serialize', base.clearPlace); // fixed by S
 			base.$el.parents('form').bind('submit', base.clearPlace);
 		};
 		// Hold with the default value attribute
@@ -35,6 +38,7 @@
 		// Refill with the default value attribute
 		base.clearPlace = function() {
 			var value = base.$el.val();
+			//console.log(base.$el, value);
 			if (value == base.placeholderText && base.$el.hasClass(base.options.className)) base.$el.val('');
 		};
 		base.init();
