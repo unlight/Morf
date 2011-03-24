@@ -50,14 +50,14 @@ unset($tmp);
 // morf ~ form ()
 class MorfPlugin extends Gdn_Plugin {
 	
-/*	public function PluginController_MorfTest_Create($Sender) {
+	public function PluginController_MorfTest_Create($Sender) {
 		$Sender->Form = Gdn::Factory('Form');
 		$Sender->View = $this->GetView('morftest.php');
 		
 		$Sender->AddJsFile('plugins/Morf/jquery.uploadify/jquery.uploadify.min.js');
 		
 		$Sender->Render();
-	}*/
+	}
 
 	public static function GenerateCleanTargetName($InputName, $TargetFolder = False, $Property = False) {
 		if ($TargetFolder) {
@@ -154,6 +154,7 @@ class MorfPlugin extends Gdn_Plugin {
 		if (property_exists($Sender, 'Form') == False) return;
 		$Sender->AddCssFile('plugins/Morf/design/morf.css');
 		$Sender->AddJsFile('plugins/Morf/js/jquery.placeheld.js');		
+		$Sender->AddJsFile('plugins/Morf/lazyload/lazyload.js');
 		$Sender->AddJsFile('plugins/Morf/js/morf.js');
 		
 		$DateWebRootPlugin = Gdn_Plugin::GetWebResource('jquery.dynDateTime');

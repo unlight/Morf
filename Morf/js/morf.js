@@ -24,7 +24,6 @@ $(document).ready(function(){
 				$(this).each(function(index, node){
 					if($(node).data('datetime') != null) return;
 					$(node).attr('autocomplete', 'off').data('datetime', true);
-					//console.log(node);
 					$('<button class="Button DateBoxPicker" title="Choose date...">...</button>')
 						.insertAfter(node);
 					$(document.createTextNode(" ")).insertAfter(node);
@@ -34,6 +33,7 @@ $(document).ready(function(){
 		});
 	}
 
+	// TODO: LazyLoad Calendar
 	function LoadJsCalendar(){
 		if(JsDateTimeLoading) return;
 		JsDateTimeLoading = true;
@@ -47,91 +47,44 @@ $(document).ready(function(){
 	SetInputs();
 	
 	
-	// 2. upload box
-	
-	var WaitingInputs = [];
-	var ReceiveUploadFileURL = gdn.url('plugin/receiveuploadfile');
-	var Form;
-	var ScriptsLoading = false;
-
-	function BindUpload(input){
-		noswfupload.lang.removeFile = '';
-		var wrap = noswfupload.wrap(input, 0);
-		var LocalInput = input;
-		var UploadBoxText = $(LocalInput).parents('li').find('.InputBox').first();
-		//var label = $(LocalInput).parents('li').find('label[for='+UploadBoxText.attr('id')+']');
-		//var up = $(LocalInput).parents('li').find('.noswfupload');
-		//$('<span>', {'class': 'ChooseFile', html:'&uarr;'}).insertAfter(LocalInput);
-		//$('<span>', {'class': 'ChooseFile'}).wrap(LocalInput);
-		//$('<span>', {'class': 'ChooseFile', html:'&uarr;'}).prependTo(up);
-		
-		function DoUpload(){
-			var file = wrap.files.shift();
-			wrap.files = [file];
-			var uploadto = $.param(Form.find('input[name$=UploadTo]').get());
-			var url = ReceiveUploadFileURL + '?' + uploadto + '&DeliveryType=BOOL&DeliveryMethod=JSON';
-			//console.log(uploadto, url);
-			wrap.upload({
-				url: url,
-				onerror: function(){
-					gdn.inform("WARNING: Unable to upload " + this.file.fileName, true);
-				},
-				onprogress: function(rpe, xhr){
-					$(UploadBoxText).attr('disabled', 'disabled');
-					var Sent = 0, Total = 0;
-					if (this.file.fileSize !== -1) {
-						Total = noswfupload.size(this.total);
-						Sent = noswfupload.size(this.sent + rpe.loaded);
-					} else {
-						Sent = (this.sent / 100);
-						Total = (this.total / 100);
-					}
-					$(UploadBoxText).val(sprintf('%s, uploading: %s / %s', this.file.fileName, Sent, Total));
-				},
-				onload: function(rpe, xhr){
-					var self = this;
-					eval("var File = " + xhr.responseText);
-					if (File.Exception !== undefined) {
-						gdn.inform(File.Exception, true);
-					}
-					$(UploadBoxText).val(File.RelativePath);
-					var InputB = $(UploadBoxText).parent().find('.noswfupload > input[type=file]').first();
-					//console.log(InputB, UploadBoxText);
-					$(InputB).bind('change', DoUpload);
-					$(UploadBoxText).removeAttr('disabled');
+	// 24 Mar 2011 upload box
+	var init_upload_input = function(){
+		var inputfile = this;
+		if ($(inputfile).data('loaded')) return;
+		$(inputfile).data('loaded', true);
+		var filter = $(inputfile).attr('id').replace('UploadBoxFile', '');
+		filter = 'input[id^="'+filter+'"]';
+		var form = $(inputfile).parents('form')[0];
+		var uploadto = $(form).find('input[name$=UploadTo]').val(); // TODO: fix uploadto var
+		$(form).fileUpload({
+			namespace: 'FileUpload'+ Math.floor(Math.random() * 99999999),
+			fileInputFilter: filter,
+			dragDropSupport: false,
+			initUpload: function(event, files, index, xhr, uploadSettings, Callback){
+				//console.log('initUpload', arguments);
+				Callback();
+			},
+			onProgress: function(event, files, index, xhr, handler){
+				//console.log(event, files, index, xhr, handler);
+				if (handler.progressbar) {
+					handler.progressbar.progressbar('value', parseInt(event.loaded / event.total * 100, 10));
 				}
-			});
-		}
-
-		$(LocalInput).bind('change', DoUpload);
+			},
+			url: receivefileurl + '?UploadTo=' + uploadto + '&DeliveryType=BOOL&DeliveryMethod=JSON'
+		});
 	}
 	
-	function BindAll() {
-		for (var i = 0; i < WaitingInputs.length; i++) {
-			//console.log(i + ' ' + WaitingInputs[i], $(WaitingInputs[i]));
-			BindUpload(WaitingInputs[i]);
-		}
-		
-		WaitingInputs.length = 0;
-	}
-	
-	$('input[name$=UploadBoxFile]').livequery(function(){
-		var InputFile = this;
-		if ($(InputFile).parents().is('.noswfupload')) return;
-		if (!Form) Form = $(InputFile).parents('form').first();
-		//console.log(InputFile);
-		
-		if (ScriptsLoading == false) {
-			ScriptsLoading = true;
-			$.getScript(gdn.url('plugins/Morf/js/sprintf.js'), function(){
-				$.getScript(gdn.url('plugins/Morf/noswfupload/noswfupload.min.js'), BindAll);
-			});
-		}
-		
-		if (typeof(noswfupload) == 'object') BindUpload(InputFile);
-		else WaitingInputs[WaitingInputs.length] = InputFile;
-
+	var uploadwebroot = gdn.definition('WebRoot') + 'plugins/Morf/blueimp-jquery-file-upload';
+	var receivefileurl = gdn.url('plugin/receiveuploadfile');
+	var jsfiles = [];
+	jsfiles[jsfiles.length] = uploadwebroot+'/jquery.fileupload.js';
+	jsfiles[jsfiles.length] = 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js';
+	jsfiles[jsfiles.length] = uploadwebroot+'/jquery.fileupload-ui.js';
+	LazyLoad.js(jsfiles, function(){
+		$('input[name$=UploadBoxFile]').livequery(init_upload_input);
 	});
+	
+
 	
 	
 	// 3. placeholder
