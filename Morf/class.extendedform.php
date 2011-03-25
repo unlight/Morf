@@ -2,7 +2,22 @@
 
 class MorfForm extends Gdn_Form {
 	
-	public function UploadCBox($FieldName, $Attributes = False) {
+/*	public function UploadDBox($FieldName, $Attributes = False) {
+		$Result = '';
+		$UploadTo = GetValue('UploadTo', $Attributes, False, True);
+		$Result .= $this->TextBox($FieldName, $Attributes);
+		if (CheckPermission('Plugins.Morf.Upload.Allow')) {
+			if ($UploadTo) {
+				if (!GetValue($FieldName.'UploadTo', $this->HiddenInputs))
+					$Result .= $this->Hidden($FieldName.'UploadTo', array('value' => $UploadTo));
+			}
+			$Result .= $this->Input($FieldName.'UploadBoxFile', 'file', array('style' => 'display:none'));
+			$Result .= Wrap('#', 'a', array('class' => 'UploadDBox', 'href' => 'javascript:;'));
+		}
+		return $Result;
+	}*/
+	
+/*	public function UploadCBox($FieldName, $Attributes = False) {
 		$Result = '';
 		$Attributes['class'] = 'InputBox UploadBox';
 		$UploadTo = GetValue('UploadTo', $Attributes, '', True);
@@ -35,7 +50,7 @@ class MorfForm extends Gdn_Form {
 			//$Result .= Wrap('x', 'span', array('class' => 'UploadBBoxFile'));
 		}
 		return $Result;
-	}
+	}*/
 	
 	public function UploadBox($FieldName, $Attributes = False) {
 		$Result = '';

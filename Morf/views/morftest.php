@@ -23,15 +23,17 @@ echo $this->Form->Open(array('enctype' => 'multipart/form-data')) ?>
 <li>
 <?php echo $this->Form->Label('Choose C file', 'File');
 // array('To' => 'uploads/salesoutlet/exhibition')
-echo $this->Form->UploadCBox('File', array('UploadTo' => '/test'));
+//echo $this->Form->UploadCBox('File', array('UploadTo' => '/test1'));
+echo $this->Form->UploadBox('File', array('UploadTo' => '/test1'));
 ?>
 
 </li>
 
 <li>
-<?php echo $this->Form->Label('Choose B file', 'File');
+<?php 
+echo $this->Form->Label('Choose A file', 'File');
 // array('To' => 'uploads/salesoutlet/exhibition')
-echo $this->Form->UploadBBox('File', array('UploadTo' => '/test'));
+//echo $this->Form->UploadDBox('DMoz', array('UploadTo' => '/test'));
 ?>
 
 </li>
@@ -45,7 +47,7 @@ echo $this->Form->UploadBBox('File', array('UploadTo' => '/test'));
 
 <li>
 <?php echo $this->Form->Label('Choose', 'File');
-echo $this->Form->UploadBox('ZFile', array('UploadTo' => '/test'));
+echo $this->Form->UploadBox('ZFile', array('UploadTo' => '/test2'));
 ?>
 
 </li>
