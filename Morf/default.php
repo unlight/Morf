@@ -50,11 +50,11 @@ unset($Overwrite);
 // morf ~ form ()
 class MorfPlugin extends Gdn_Plugin {
 	
-	public function PluginController_MorfTest_Create($Sender) {
+/*	public function PluginController_MorfTest_Create($Sender) {
 		$Sender->Form = Gdn::Factory('Form');
 		$Sender->View = $this->GetView('morftest.php');
 		$Sender->Render();
-	}
+	}*/
 
 	public static function GenerateCleanTargetName($InputName, $TargetFolder = False, $Property = False) {
 		if ($TargetFolder) {
