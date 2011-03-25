@@ -34,18 +34,18 @@ TODO:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.9.16',
-	'Date' => '28 Mar 2011',
+	'Version' => '1.9.17',
+	'Date' => '25 Mar 2011',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
 	'License' => 'Liandri License',
 	'RegisterPermissions' => array('Plugins.Morf.Upload.Allow')
 );
 
-$tmp = Gdn::FactoryOverwrite(True);
-Gdn::FactoryInstall('Form', 'MorfForm', dirname(__FILE__) . DS. 'class.extendedform.php');
-Gdn::FactoryOverwrite($tmp);
-unset($tmp);
+$Overwrite = Gdn::FactoryOverwrite(True);
+Gdn::FactoryInstall('Form', 'MorfForm', dirname(__FILE__) . '/class.extendedform.php');
+Gdn::FactoryOverwrite($Overwrite);
+unset($Overwrite);
 
 // morf ~ form ()
 class MorfPlugin extends Gdn_Plugin {
@@ -68,7 +68,8 @@ class MorfPlugin extends Gdn_Plugin {
 		$TmpFile = $_FILES[$InputName]['tmp_name'];
 		$FileName = Gdn_Format::Clean(pathinfo($BaseName, 8)); // file
 		$Extension = Gdn_Format::Clean(pathinfo($BaseName, 4)); // ext
-		$Count = 0; $RandSuffix = '';
+		$Count = 0; 
+		$RandSuffix = '';
 		do {
 			if (++$Count > 250) throw new Exception('Cannot generate unique name for file.');
 			$TargetFile = $TargetFolder . '/' . $FileName . $RandSuffix . '.' . $Extension;
@@ -84,7 +85,6 @@ class MorfPlugin extends Gdn_Plugin {
 		return $Result;
 	}
 	
-	// No swf upload
 	public static function Upload($Controller, $TargetFolder) {
 		$InputName = ArrayValue(0, array_keys($_FILES));
 		$Upload = new Gdn_Upload();
@@ -102,9 +102,7 @@ class MorfPlugin extends Gdn_Plugin {
 		}
 	}
 	
-	// TODO: Rename
 	public function PluginController_ReceiveUploadFile_Create($Sender) {
-		// TODO: Maybe check by $Session->GetAttribute()
 		$Session = Gdn::Session();
 		$Ex = False;
 		if (!$Session->IsValid()) 
@@ -128,20 +126,18 @@ class MorfPlugin extends Gdn_Plugin {
 	
 	public function Base_Render_Before(&$Sender) {
 		if (property_exists($Sender, 'Form') == False) return;
-		$Sender->AddCssFile('plugins/Morf/design/morf.css');
-		$Sender->AddJsFile('plugins/Morf/js/jquery.placeheld.js');		
-		$Sender->AddJsFile('plugins/Morf/lazyload/lazyload.js');
-		$Sender->AddJsFile('plugins/Morf/js/morf.js');
-		
-		$DateWebRootPlugin = Gdn_Plugin::GetWebResource('jquery.dynDateTime');
-		$Sender->AddDefinition('JsDateTime', $DateWebRootPlugin);
-		
-		$Language = ArrayValue(0, explode('-', Gdn::Locale()->Current()));
-		foreach (array($Language, 'en') as $Language) {
-			$LanguageJsFile = 'jquery.dynDateTime/lang/calendar-'.$Language.'.js';
-			if (file_exists(Gdn_Plugin::GetResource($LanguageJsFile))) {
-				$Sender->AddDefinition('JsDateTimeLanguage', 'calendar-'.$Language.'.js');
-				break;
+		if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
+			$Sender->AddCssFile('plugins/Morf/design/morf.css');
+			$Sender->AddJsFile('plugins/Morf/vendors/lazyload/lazyload.js');
+			$Sender->AddJsFile('plugins/Morf/js/jquery.placeheld.js');		
+			$Sender->AddJsFile('plugins/Morf/js/morf.js');
+			$Language = ArrayValue(0, explode('-', Gdn::Locale()->Current()));
+			foreach (array($Language, 'en') as $Language) {
+				$LanguageJsFile = 'vendors/jquery.dynDateTime/lang/calendar-'.$Language.'.js';
+				if (file_exists(Gdn_Plugin::GetResource($LanguageJsFile))) {
+					$Sender->AddDefinition('CalendarLanguage', 'calendar-'.$Language.'.js');
+					break;
+				}
 			}
 		}
 	}

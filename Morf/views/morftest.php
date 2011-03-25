@@ -31,9 +31,9 @@ echo $this->Form->UploadBox('File', array('UploadTo' => '/test1'));
 
 <li>
 <?php 
-//echo $this->Form->Label('Choose A file', 'File');
+echo $this->Form->Label('Choose A file', 'File');
 // array('To' => 'uploads/salesoutlet/exhibition')
-//echo $this->Form->UploadBox('File', array('UploadTo' => '/test'));
+//echo $this->Form->UploadDBox('DMoz', array('UploadTo' => '/test'));
 ?>
 
 </li>

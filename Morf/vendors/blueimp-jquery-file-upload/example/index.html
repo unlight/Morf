@@ -22,17 +22,16 @@ body {
 </form>
 <table id="files"></table>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
-<!-- <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js"></script> -->
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js"></script>
 <script src="../jquery.fileupload.js"></script>
-<!-- <script src="../jquery.fileupload-ui.js"></script> -->
+<script src="../jquery.fileupload-ui.js"></script>
 <script>
 /*global $ */
 $(function () {
-    $('#file_upload').fileUpload({
+    $('#file_upload').fileUploadUI({
         uploadTable: $('#files'),
         downloadTable: $('#files'),
         buildUploadRow: function (files, index) {
-            console.log(files[index]);
             return $('<tr><td>' + files[index].name + '<\/td>' +
                     '<td class="file_upload_progress"><div><\/div><\/td>' +
                     '<td class="file_upload_cancel">' +

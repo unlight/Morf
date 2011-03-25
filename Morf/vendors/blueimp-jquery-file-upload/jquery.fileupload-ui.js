@@ -1,12 +1,12 @@
 /*
- * jQuery File Upload User Interface Plugin 3.6
+ * jQuery File Upload User Interface Plugin 3.7.1
+ * https://github.com/blueimp/jQuery-File-Upload
  *
- * Copyright 2010, Sebastian Tschan, AQUANTUM
+ * Copyright 2010, Sebastian Tschan
+ * https://blueimp.net
+ *
  * Licensed under the MIT license:
  * http://creativecommons.org/licenses/MIT/
- *
- * https://blueimp.net
- * http://www.aquantum.de
  */
 
 /*jslint browser: true */
@@ -51,6 +51,7 @@
             dragOverTimeout,
             isDropZoneEnlarged;
         
+        this.requestHeaders = {'Accept': 'application/json, text/javascript, */*; q=0.01'};
         this.dropZone = container;
         this.imageTypes = /^image\/(gif|jpeg|png)$/;
         this.previewSelector = '.file_upload_preview';
@@ -135,7 +136,7 @@
             if (uploadRow) {
                 handler.progressbar = handler.initProgressBar(
                     uploadRow.find(handler.progressSelector),
-                    (xhr.upload ? 0 : 100)
+                    0
                 );
                 uploadRow.find(handler.cancelSelector).click(function (e) {
                     handler.cancelUpload(e, files, index, xhr, handler);
@@ -151,11 +152,24 @@
             );
         };
         
+        this.initUploadProgress = function (xhr, handler) {
+            if (!xhr.upload) {
+                handler.progressbar.progressbar(
+                    'value',
+                    100 // indeterminate progress displayed by a full animated progress bar
+                );
+            }
+        };
+        
         this.initUpload = function (event, files, index, xhr, handler, callBack) {
             handler.initUploadRow(event, files, index, xhr, handler, function () {
                 if (typeof handler.beforeSend === func) {
-                    handler.beforeSend(event, files, index, xhr, handler, callBack);
+                    handler.beforeSend(event, files, index, xhr, handler, function () {
+                        handler.initUploadProgress(xhr, handler);
+                        callBack();
+                    });
                 } else {
+                    handler.initUploadProgress(xhr, handler);
                     callBack();
                 }
             });
