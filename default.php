@@ -34,8 +34,8 @@ TODO:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.9.17',
-	'Date' => '25 Mar 2011',
+	'Version' => '1.9.19',
+	'Date' => '26 Mar 2011',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
 	'License' => 'Liandri License',
@@ -56,7 +56,7 @@ class MorfPlugin extends Gdn_Plugin {
 		$Sender->Render();
 	}*/
 
-	public static function GenerateCleanTargetName($InputName, $TargetFolder = False, $Property = False) {
+	protected static function GenerateCleanTargetName($InputName, $TargetFolder = False, $Property = False) {
 		if ($TargetFolder) {
 			$TargetFolder = str_replace('..', '', $TargetFolder);
 			$TargetFolder = trim($TargetFolder, '/\\');
@@ -85,43 +85,50 @@ class MorfPlugin extends Gdn_Plugin {
 		return $Result;
 	}
 	
-	public static function Upload($Controller, $TargetFolder) {
+	protected static function Upload($Controller, $TargetFolder) {
 		$InputName = ArrayValue(0, array_keys($_FILES));
 		$Upload = new Gdn_Upload();
-		try {
-			if ($InputName == False ) throw new Exception('No files.', 500);
-			$TmpFile = $Upload->ValidateUpload($InputName, True);
-			$File = self::GenerateCleanTargetName($InputName, $TargetFolder);
-			if (move_uploaded_file($TmpFile, $File->TargetFile) || copy($TmpFile, $File->TargetFile)) {
-				if (file_exists($TmpFile)) unlink($TmpFile);
-				echo json_encode($File);
-			}
-		} catch (Exception $Ex) { // if something was wrong ... should generate onerror event
-			$Exception = new Exception($Ex->GetMessage(), 500);
-			$Controller->RenderException($Exception);
+		if ($InputName == False ) throw new Exception('No files.', 500);
+		$TmpFile = $Upload->ValidateUpload($InputName, True);
+		$File = self::GenerateCleanTargetName($InputName, $TargetFolder);
+		if (move_uploaded_file($TmpFile, $File->TargetFile) || copy($TmpFile, $File->TargetFile)) {
+			if (file_exists($TmpFile)) unlink($TmpFile);
+			return $File;
 		}
+		throw new Exception('Error while uploading file.');
 	}
 	
 	public function PluginController_ReceiveUploadFile_Create($Sender) {
 		$Session = Gdn::Session();
+		$Sender->Form = $Form = Gdn::Factory('Form');
 		$Ex = False;
 		if (!$Session->IsValid()) 
 			$Ex = new Exception('Permission problem.', 500);
 		elseif (!$Session->CheckPermission('Plugins.Morf.Upload.Allow')) 
 			$Ex = new Exception('Permission problem.', 500);
-		if ($Ex != False) return $Sender->RenderException($Ex);
+		if ($Ex != False) $Form->AddError($Ex);
 		
-		$InputName = ArrayValue(0, array_keys($_FILES));
-		$UploadToName = substr($InputName, 0, -strlen('UploadBoxFile')) . 'UploadTo';
-		$DirectoryFound = False;
-		if ($InputName && $UploadToName) foreach($_GET as $UploadToKey => $Directory) {
-			if (preg_match('/'.$UploadToName.'$/', $UploadToKey)) {
-				$DirectoryFound = True;
-				break;
+		if ($Form->ErrorCount() == 0) {
+			$InputName = ArrayValue(0, array_keys($_FILES));
+			$UploadToName = substr($InputName, 0, -strlen('UploadBoxFile')) . 'UploadTo';
+			$DirectoryFound = False;
+			if ($InputName && $UploadToName) foreach($_GET as $UploadToKey => $Directory) {
+				if (preg_match('/'.$UploadToName.'$/', $UploadToKey)) {
+					$DirectoryFound = True;
+					break;
+				}
+			}
+			if ($DirectoryFound == False) $Directory = GetIncomingValue('UploadTo');
+			try {
+				$File = self::Upload($Sender, $Directory);
+				$Sender->SetJson('File', $File);
+			} catch (Exception $Ex) {
+				// if something was wrong ... should generate onerror event
+				$Form->AddError($Ex);
 			}
 		}
-		if ($DirectoryFound == False) $Directory = GetIncomingValue('UploadTo');
-		self::Upload($Sender, $Directory);
+		if ($Form->ErrorCount() > 0 && $Ex != False) $Sender->StatusMessage = $Ex->GetMessage();
+		$Sender->Render();
 	}
 	
 	public function Base_Render_Before(&$Sender) {

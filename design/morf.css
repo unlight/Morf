@@ -1,7 +1,8 @@
 /* PlaceHeld jQuery plugin*/
-input.placeheld{
-	color:#bbb;
-}
+input:-moz-placeholder { color:#bbb;}
+input.placeheld { color:#bbb;}
+input::-webkit-input-placeholder { color:#bbb;}
+
 
 /* div.Popup has z-index 5000 */
 div.calendar { z-index: 5001 !important;}

@@ -68,9 +68,12 @@ $(document).ready(function(){
 			},
 			onLoad: function(e, files, index, xhr, handler){
 				$(inputtextbox).data('inprogress', true);
-				var file = handler.parseResponse(xhr);
-				$(inputtextbox).val(file.RelativePath);					
-				$(inputtextbox).removeAttr('disabled');
+				var result = handler.parseResponse(xhr);
+				$(inputtextbox).val('').removeAttr('disabled');
+				if (result.FormSaved == false) return gdn.inform(result.StatusMessage);
+				if (result.File) {
+					$(inputtextbox).val(result.File.RelativePath);
+				}
 			},
 			formData: function (form) {
 				return {};
