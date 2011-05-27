@@ -121,6 +121,10 @@ class MorfForm extends Gdn_Form {
 	}*/
 	
 	public function DropDown($FieldName, $DataSet, $Attributes = FALSE) {
+		
+		$ValueField = ArrayValueI('ValueField', $Attributes, 'value');
+        $TextField = ArrayValueI('TextField', $Attributes, 'text');
+		
 		// TODO: maybe only for DELIVERY_TYPE_ALL
 		$MaxDropDownTextField = C('Plugins.Morf.MaxLengthDropDownTextField');
 		if(GetIncomingValue('DeliveryType', DELIVERY_TYPE_ALL) != DELIVERY_TYPE_ALL){
@@ -129,15 +133,17 @@ class MorfForm extends Gdn_Form {
 		// TODO: FOR ARRAY DATASET NEED TO
 		if (is_numeric($MaxTextLength) && $MaxTextLength > 0) {
 			if (is_object($DataSet)) {
-				$TextField = ArrayValueI('TextField', $Attributes, 'text');
 				$TestValue = GetValue($TextField, $DataSet->FirstRow());
 				if($TestValue !== False) foreach($DataSet->ResultObject() as $Data) {
 					$S = SliceString(GetValue($TextField, $Data), $MaxTextLength);
 					SetValue($TextField, $Data, $S);
 				}
-			} elseif(is_array($DataSet)) {
+			} elseif (is_array($DataSet)) {
 				foreach($DataSet as &$Value) {
 					$Value = SliceString($Value, $MaxTextLength);
+/*					if (is_object($Value)) $Value->$ValueField = SliceString($Value->$ValueField, $MaxTextLength);
+					elseif (is_array($Value)) $Value[$ValueField] = SliceString($Value[$ValueField], $MaxTextLength);
+					else $Value = SliceString($Value, $MaxTextLength);*/
 				}
 			}
 		}
