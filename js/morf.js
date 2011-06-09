@@ -105,7 +105,7 @@ $(document).ready(function(){
 	}
 	
 	var uploadboxfile_count = 1;
-	var uploadwebroot = gdn.combinePaths(WebRoot, 'plugins/Morf/vendors/blueimp-jquery-file-upload');
+	var uploadwebroot = gdn.combinePaths(WebRoot, 'plugins/Morf/vendors/jquery-file-upload');
 	var receivefileurl = gdn.url('plugin/receiveuploadfile');
 	var loaded_fileupload = 0;
 	
