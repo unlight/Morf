@@ -30,3 +30,9 @@ div.calendar table {
 	width:50%;
 }
 
+
+
+div.MorfCheckBoxList ul.CheckBoxList,
+div.MorfCheckBoxList ul.CheckBoxList li {
+	padding:0 !important;
+}
