@@ -34,7 +34,7 @@ TODO:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.10a',
+	'Version' => '1.10b',
 	'Date' => 'Summer 2011',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
@@ -43,11 +43,10 @@ $PluginInfo['Morf'] = array(
 );
 
 $Overwrite = Gdn::FactoryOverwrite(True);
-Gdn::FactoryInstall('Form', 'MorfForm', dirname(__FILE__) . '/class.extendedform.php');
+Gdn::FactoryInstall('Form', 'MorfForm', dirname(__FILE__) . '/class.morfform.php');
 Gdn::FactoryOverwrite($Overwrite);
 unset($Overwrite);
 
-// morf ~ form ()
 class MorfPlugin extends Gdn_Plugin {
 	
 /*	public function PluginController_MorfTest_Create($Sender) {
