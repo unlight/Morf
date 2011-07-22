@@ -34,7 +34,7 @@ TODO:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.10b',
+	'Version' => '1.11',
 	'Date' => 'Summer 2011',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',

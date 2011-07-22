@@ -103,7 +103,7 @@ class MorfForm extends Gdn_Form {
 		return str_replace($ID, $ForID, $Full);
 	}
 	
-	public function CheckBoxList($FieldName, $DataSet, $ValueDataSet, $Attributes){
+	public function CheckBoxList($FieldName, $DataSet, $ValueDataSet = NULL, $Attributes = FALSE) {
 		if (!is_object($DataSet) || $DataSet->NumRows() <= 5) {
 			return parent::CheckBoxList($FieldName, $DataSet, $ValueDataSet, $Attributes);
 		}
