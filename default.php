@@ -22,9 +22,10 @@ CONFIG:
 $Configuration['Plugins']['Morf']['MaxLengthDropDownTextField']['Window'] = 55;
 $Configuration['Plugins']['Morf']['MaxLengthDropDownTextField']['Default'] = 0;
 
-KNOWN ISSUES:
+KNOWN BUGS:
 - No effect if form object was created directly by operator "new" (eg. $Form = new Gdn_Form).
 - Use Gdn::Factory (or property (array) Uses in Gdn_Controller class)
+- Upload script doesn't work in opera
 
 TODO:
 - settings / config
@@ -34,7 +35,7 @@ TODO:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.11',
+	'Version' => '1.12',
 	'Date' => 'Summer 2011',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
@@ -134,14 +135,13 @@ class MorfPlugin extends Gdn_Plugin {
 		if (property_exists($Sender, 'Form') == False) return;
 		if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
 			$Sender->AddCssFile('plugins/Morf/design/morf.css');
-			$Sender->AddJsFile('plugins/Morf/vendors/lazyload/lazyload.js');
 			$Sender->AddJsFile('plugins/Morf/js/jquery.placeheld.js');		
 			$Sender->AddJsFile('plugins/Morf/js/morf.js');
 			$Language = ArrayValue(0, explode('-', Gdn::Locale()->Current()));
 			foreach (array($Language, 'en') as $Language) {
 				$LanguageJsFile = 'vendors/jquery.dynDateTime/lang/calendar-'.$Language.'.js';
 				if (file_exists(Gdn_Plugin::GetResource($LanguageJsFile))) {
-					$Sender->AddDefinition('CalendarLanguage', 'calendar-'.$Language.'.js');
+					$Sender->AddDefinition('CalendarLanguage', $Language);
 					break;
 				}
 			}
