@@ -3,13 +3,11 @@
 /* ==========================================================
 FEATURES:
 Some render improvements in form class. 
-1) switched month and day menu in Date(); [REMOVED]
-2) added id attribute to form errors (for future jquery plugins/effects);
-3) allow intercept form enctype param (example: $Controller->Form->SetMultipart(), call it before render. Controller_Render_Before() is good place);
-4) columned CheckBoxList().
-5) HTML5 form input attributes (date/datetime picker)
-6) Allow strip long text values in dropdown menu
-7) UploadBox() method. AJAX uploader.
+- id attribute to form errors (for future jquery plugins/effects);
+- columned CheckBoxList()
+- HTML5 form input attributes (date/datetime picker)
+- allow strip long text values in dropdown menu
+- UploadBox() method. AJAX uploader.
 
 USAGE:
 // HTML5 form input attributes
@@ -23,19 +21,16 @@ $Configuration['Plugins']['Morf']['MaxLengthDropDownTextField']['Window'] = 55;
 $Configuration['Plugins']['Morf']['MaxLengthDropDownTextField']['Default'] = 0;
 
 KNOWN BUGS:
-- No effect if form object was created directly by operator "new" (eg. $Form = new Gdn_Form).
-- Use Gdn::Factory (or property (array) Uses in Gdn_Controller class)
 - Upload script doesn't work in opera
 
 TODO:
 - settings / config
-
 */
 
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.12',
+	'Version' => '1.20.2.0.18',
 	'Date' => 'Summer 2011',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
@@ -43,17 +38,161 @@ $PluginInfo['Morf'] = array(
 	'RegisterPermissions' => array('Plugins.Morf.Upload.Allow')
 );
 
-$Overwrite = Gdn::FactoryOverwrite(True);
+/*$Overwrite = Gdn::FactoryOverwrite(True);
 Gdn::FactoryInstall('Form', 'MorfForm', dirname(__FILE__) . '/class.morfform.php');
 Gdn::FactoryOverwrite($Overwrite);
-unset($Overwrite);
+unset($Overwrite);*/
 
 class MorfPlugin extends Gdn_Plugin {
 	
 /*	public function PluginController_MorfTest_Create($Sender) {
-		$Sender->Form = Gdn::Factory('Form');
+		$Sender->Form = Gdn::Factory('Form', 'OnlineClient');
+		$Sender->Form->UploadBox('csdsd', array('sadasd'));
+		//d($Sender->Form);
 		$Sender->View = $this->GetView('morftest.php');
 		$Sender->Render();
+	}*/
+	
+	public function Gdn_Form_UploadBox_Create($Form) {
+		$FieldName =& $Form->EventArguments[0];
+		$Attributes =& $Form->EventArguments[1];
+
+		$Result = '';
+		$UploadTo = GetValue('UploadTo', $Attributes, False, True);
+		$Result .= $Form->TextBox($FieldName, $Attributes);
+		if (CheckPermission('Plugins.Morf.Upload.Allow')) {
+			$InputAttributes = array('size' => 1, 'title' => T('Choose file'));
+			if ($UploadTo) {
+				if (!GetValue($FieldName.'UploadTo', $Form->HiddenInputs))
+					$Result .= $Form->Hidden($FieldName.'UploadTo', array('value' => $UploadTo));
+			}
+			$Result .= ' '.$Form->Input($FieldName.'UploadBoxFile', 'file', $InputAttributes);
+		}
+		return $Result;
+	}
+	
+	public function Gdn_Form_DateBox_Create($Form) {
+		
+		$FieldName =& $Form->EventArguments[0];
+		$Attributes =& $Form->EventArguments[1];
+
+		$Class = ArrayValueI('class', $Attributes, False);
+		if ($Class === False) $Attributes['class'] = 'InputBox'; // DateBox?
+		return $Form->Input($FieldName, 'date', $Attributes);
+	}
+	
+	public function Gdn_Form_DateTimeBox_Create($Form) {
+		
+		$FieldName =& $Form->EventArguments[0];
+		$Attributes =& $Form->EventArguments[1];
+		
+		$Class = ArrayValueI('class', $Attributes, False);
+		if ($Class === False) $Attributes['class'] = 'InputBox'; // DateBox?
+		return $Form->Input($FieldName, 'datetime', $Attributes);
+	}
+	
+	public function Gdn_Form_ClearErrors_Create($Form) {
+		// BUG: _ValidationResults is protected
+		$Form->_ValidationResults = array();
+	}
+	
+	public function Gdn_Form_DropDown_Override($Form) {
+
+		$FieldName =& $Form->EventArguments[0];
+		$DataSet =& $Form->EventArguments[1];
+		$Attributes =& $Form->EventArguments[2];
+		
+		//$ValueField = ArrayValueI('ValueField', $Attributes, 'value');
+        $TextField = ArrayValueI('TextField', $Attributes, 'text');
+		
+		$MaxDropDownTextField = C('Plugins.Morf.MaxLengthDropDownTextField');
+		if (GetIncomingValue('DeliveryType', DELIVERY_TYPE_ALL) != DELIVERY_TYPE_ALL) {
+			$MaxTextLength = GetValue('Window', $MaxDropDownTextField);
+		} else $MaxTextLength = GetValue('Default', $MaxDropDownTextField);
+		if (is_numeric($MaxTextLength) && $MaxTextLength > 0) {
+			if (is_object($DataSet)) {
+				$TestValue = GetValue($TextField, $DataSet->FirstRow());
+				if($TestValue !== False) foreach($DataSet->ResultObject() as $Data) {
+					$S = SliceString(GetValue($TextField, $Data), $MaxTextLength);
+					SetValue($TextField, $Data, $S);
+				}
+			} elseif (is_array($DataSet)) {
+				// ResultSet is unexpected here
+				foreach($DataSet as &$Value) {
+					$Value = SliceString($Value, $MaxTextLength);
+				}
+			}
+		}
+		return $Form->DropDown($FieldName, $DataSet, $Attributes);
+	}
+	
+	public static function CheckBoxLabelCallback($Full, $For, $ID, $FieldName) {
+		static $Counter = 0;
+		$Counter++;
+		//if($For != $ID); // shouldn't happen
+		$ForID = $FieldName.$Counter;
+		return str_replace($ID, $ForID, $Full);
+	}
+	
+	public function Gdn_Form_CheckBoxList_Override($Form) {
+		
+		$FieldName =& $Form->EventArguments[0];
+		$DataSet =& $Form->EventArguments[1];
+		$ValueDataSet =& $Form->EventArguments[2];
+		$Attributes =& $Form->EventArguments[3];
+		
+		if (!is_object($DataSet) || $DataSet->NumRows() <= 5) {
+			return $Form->CheckBoxList($FieldName, $DataSet, $ValueDataSet, $Attributes);
+		}
+		$CountItems = $DataSet->NumRows();
+		
+		$ValueField = ArrayValueI('ValueField', $Attributes, 'value');
+		$TextField = ArrayValueI('TextField', $Attributes, 'text');
+		$CountColumns = GetValue('Columns', $Attributes, 4, True);
+		if (GetIncomingValue('DeliveryType', DELIVERY_TYPE_ALL) != DELIVERY_TYPE_ALL) $CountColumns -= 1;
+		if ($CountColumns <= 0) $CountColumns = 1;
+		
+		$DataArray = ConsolidateArrayValuesByKey($DataSet->ResultArray(), $TextField, $ValueField);
+		
+		$InColumn = floor($CountItems / $CountColumns);
+		$OffsetCheckboxCount = ($CountItems % $CountColumns);
+		
+		$Offset = 0;
+		$Return = '';
+		
+		if (!$ValueDataSet) $ValueDataSet = array();
+		
+		while ($Offset < $CountItems) {
+			$Length = $InColumn;
+			if ($OffsetCheckboxCount > 0) {
+				$OffsetCheckboxCount = $OffsetCheckboxCount - 1;
+				$Length++;
+			}
+			$ColumnCheckboxArray = array_slice($DataArray, $Offset, $Length);
+			$Offset += $Length;
+			$Html = $Form->CheckBoxList($FieldName, $ColumnCheckboxArray, $ValueDataSet, $Attributes);
+			$Html = preg_replace('/for\="('.$FieldName.'\d+)".*?\<input type\="checkbox" id\="('.$FieldName.'\d+)"/ies', 'self::CheckBoxLabelCallback("$0", "$1", "$2", "'.$FieldName.'")', $Html);
+			$Return .= Wrap($Html, 'div', array('class' => 'MorfCheckBoxList Width1of'.$CountColumns));
+			if ($Offset == $Length) $Length = $InColumn;
+		}
+		
+		$Return = Wrap($Return, 'div');
+		return $Return;
+	}
+	
+/*	public function Gdn_Form_Errors_Override() {
+		if (!(is_array($this->_ValidationResults) && count($this->_ValidationResults) > 0)) return '';
+		$Return = '';
+		foreach ($this->_ValidationResults as $FieldName => $Problems) {
+			$Count = count($Problems);
+			for ($i = 0; $i < $Count; ++$i) {
+				$Error = sprintf(Gdn::Translate($Problems[$i]), Gdn::Translate($FieldName));
+				$FieldName = $this->IDPrefix . Gdn_Format::AlphaNumeric(str_replace('.', '-dot-', $FieldName));
+				$Return .= sprintf('<li id="%s">%s</li>', 'Error_'.$FieldName, $Error);
+			}
+		}
+		$Return = Wrap(Wrap($Return, 'ul'), 'div', array('class' => 'Messages Errors'));
+		return $Return;
 	}*/
 
 	protected static function GenerateCleanTargetName($InputName, $TargetFolder = False, $Property = False) {
