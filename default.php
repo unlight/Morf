@@ -30,7 +30,7 @@ TODO:
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Extended form class.',
-	'Version' => '1.20.2.0.18',
+	'Version' => '1.21.2.0.18',
 	'Date' => 'Summer 2011',
 	'Author' => 'Frostbite',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
@@ -274,8 +274,10 @@ class MorfPlugin extends Gdn_Plugin {
 		if (property_exists($Sender, 'Form') == False) return;
 		if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
 			$Sender->AddCssFile('plugins/Morf/design/morf.css');
-			$Sender->AddJsFile('plugins/Morf/js/jquery.placeheld.js');		
+			$Sender->AddJsFile('plugins/Morf/js/jquery.placeheld.js');
 			$Sender->AddJsFile('plugins/Morf/js/morf.js');
+			$Sender->AddJsFile('plugins/Morf/vendors/dowhen/jquery.dowhen.min.js');
+			
 			$Language = ArrayValue(0, explode('-', Gdn::Locale()->Current()));
 			foreach (array($Language, 'en') as $Language) {
 				$LanguageJsFile = 'vendors/jquery.dynDateTime/lang/calendar-'.$Language.'.js';
