@@ -7,11 +7,23 @@ $(document).ready(function(){
 		$(link).attr('href', file);
 		$('head').append(link);
 	}
-	var addjsfile = function(file, webroot) {
-		if (typeof(webroot) != 'undefined') file = gdn.combinePaths(webroot, file);
-		$.getScript(file);
+	
+	var IncludeJs = function(files) {
+		if (typeof(files) == 'string') files = [files];
+		var onload;
+		var script = document.createElement('script');
+		var file = files.shift();
+		script.setAttribute('type', 'text/javascript');
+		script.setAttribute('src', file);
+		document.body.appendChild(script);
+		if (files.length > 0) {
+			onload = function() { IncludeJs(files); }
+			script.onreadystatechange = onload;
+			script.onload = onload;
+		}
 	}
-	// 27 Apr 2011. Input datetime
+
+	// 1) 27 Apr 2011. Input datetime
 	var calendarloading = false;
 	var calendarloaded = 0;
 	var dyndtwebroot = gdn.combinePaths(WebRoot, 'plugins/Morf/vendors/jquery.dynDateTime');
@@ -39,14 +51,14 @@ $(document).ready(function(){
 		if (!calendarloading){
 			calendarloading = true;
 			addcssfile('/skins/aqua/theme.css', dyndtwebroot);
-			addjsfile('/jquery.dynDateTime.pack.js', dyndtwebroot);
-			addjsfile('/lang/calendar-'+gdn.definition('CalendarLanguage')+'.js', dyndtwebroot);
+			IncludeJs( gdn.combinePaths(dyndtwebroot, '/jquery.dynDateTime.pack.js') );
+			IncludeJs( gdn.combinePaths(dyndtwebroot, '/lang/calendar-'+gdn.definition('CalendarLanguage')+'.js') );
 		}
 		$.doWhen(testcalendar, function(){
 			settings.firstDay = Calendar._FD || 1;
 			if ($(element).data('datetime') != null) return;
 			$(element).attr('autocomplete', 'off').data('datetime', true);
-			$('<button class="Button DateBoxPicker" title="Choose date…">…</button>').insertAfter(element);
+			$('<button class="DateBoxPicker" title="Choose date…">…</button>').insertAfter(element);
 			$(document.createTextNode(" ")).insertAfter(element);
 			$(element).dynDateTime(settings);
 		});
@@ -60,9 +72,83 @@ $(document).ready(function(){
 		makeinputcalendar(this, {ifFormat: "%Y-%m-%d %H:%M", showsTime: true, button: ".next()"});
 	});
 	
+	
+	// 2) 19 Oct 2011 (Uploadify)
+	var UploadifyLoading = false;
+	var TestUploadify = function() {
+		return typeof($.fn.uploadify) == 'function';
+	}
+	var LoadUploadify = function() {
+		if (UploadifyLoading) return;
+		UploadifyLoading = true;
+		IncludeJs( gdn.combinePaths(WebRoot, '/plugins/Morf/vendors/uploadify3/jquery.uploadify.min.js') );
+	}
+	
+	var TransientKey = gdn.definition('TransientKey');
+	var SessionUserID = gdn.definition('SessionUserID');
+
+	$('input[id$=UploadBox]').livequery(function(){
+		LoadUploadify();
+		var Data = $.parseJSON($(this).val());
+		var UploadFolder = $(this).val();
+		var TextBox = $(this).prev();
+		var TriggerId = TextBox.attr('id') + '_' + Math.floor(Math.random() * 999999);
+		var Trigger = $('<span>', {
+			css: {display:'inline'},
+			id: TriggerId
+		});
+		$(TextBox).after(Trigger);
+		
+		Data['TransientKey'] = TransientKey;
+		Data['SessionUserID'] = SessionUserID;
+		//Data['Debug'] = 1;
+		
+		var SetUploadifyTrigger = function(){
+			Trigger.uploadify({
+				buttonText: '⇧',
+				checkExisting: false,
+				cancelImage: '',
+				height: 22,
+				width: 25,
+				postData: Data,
+				fileObjName: 'File',
+				debug: true,
+				expressInstall: null,
+				swf: gdn.combinePaths(WebRoot, '/plugins/Morf/vendors/uploadify3/uploadify.swf'),
+				uploader: gdn.url('/dashboard/plugin/receiveupload'),
+				auto: true,
+				onUploadProgress: function(file, fileBytesLoaded, fileTotalBytes) {
+					$(TextBox).data('inprogress', true);
+					var percent = parseInt(fileBytesLoaded / fileTotalBytes * 100, 10);
+					var stringprogress = file.name + ' / ' + parseInt(fileBytesLoaded/1024) + 'K ('+percent+'%)';
+					$(TextBox).val(stringprogress);
+				},
+				onUploadStart: function(file) {
+					//console.log(file);
+				},
+				onUploadComplete: function(file) {
+					//console.log('onUploadComplete', file);
+				},
+				onUploadSuccess: function(file, data, response) {
+					//console.log('onUploadSuccess', file, data, response);
+					$(TextBox).val(data);
+				},
+				onUploadError: function(file, dummy, errorCode, errorMsg) {
+					var ErrorMsg = file.name + ': ' + errorMsg;
+					gdn.informError(ErrorMsg);
+					$(Trigger).uploadifyCancel(TriggerId);
+					$(Trigger).uploadifyClearQueue();
+				}
+			});
+		}
+		
+		$.doWhen(TestUploadify, SetUploadifyTrigger);
+		
+	});
+	
 	// 24 Mar 2011 upload box
 	
-	var uploadboxfile_count = 1;
+/*	var uploadboxfile_count = 1;
 	var uploadwebroot = gdn.combinePaths(WebRoot, 'plugins/Morf/vendors/jquery-file-upload');
 	var receivefileurl = gdn.url('plugin/receiveuploadfile');
 	var loaded_fileupload = false;
@@ -79,8 +165,8 @@ $(document).ready(function(){
 		if ($(inputfile).data('loaded')) return;
 		if (!loaded_fileupload) {
 			loaded_fileupload = true;
-			addjsfile('/jquery.fileupload.js', uploadwebroot);
-			addjsfile('/jquery.fileupload-ui.js', uploadwebroot);
+			IncludeJs( gdn.combinePaths(uploadwebroot, '/jquery.fileupload.js') );
+			IncludeJs( gdn.combinePaths(uploadwebroot, '/jquery.fileupload-ui.js') );
 		}
 		
 		$.doWhen(function(){
@@ -91,6 +177,13 @@ $(document).ready(function(){
 			var inputtextbox = $('#'+filter)[0];
 			var form = $(inputfile).parents('form')[0];
 			var uploadto = $('#'+filter+'UploadTo', form).val();
+			if (!uploadto) {
+				if (filter.indexOf('-dot-') > 0) {
+					var uploadname = filter.split('-dot-')[1] +'UploadTo';
+					uploadto = $('input[name$='+uploadname+']', form).val();
+				}
+			}
+			
 			$(form).fileUploadUI({
 				url: receivefileurl + '?UploadTo=' + uploadto + '&DeliveryType=BOOL&DeliveryMethod=JSON',
 				namespace: 'FileUpload'+ (uploadboxfile_count++),
@@ -127,7 +220,7 @@ $(document).ready(function(){
 	
 	$('input[name$=UploadBoxFile]').livequery(function(){
 		init_upload_input(this);
-	});
+	});*/
 
 	// 25 mar 2011 (https://developer.mozilla.org/en/DOM/File)
 /*	$('a.UploadDBox').each(function(index, element){
@@ -139,7 +232,7 @@ $(document).ready(function(){
 	});*/
 
 	
-	// 3. placeholder
+	// 3) placeholder
 	if (typeof($.placeHeld) == 'function') {
 		$("input[placeholder]").placeHeld();
 		//console.log($.placeHeld.clearPlace);

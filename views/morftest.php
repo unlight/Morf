@@ -4,7 +4,6 @@
 
 <?php 
 
-//$this->Form->AddHidden('FileUploadTo', 'test');
 echo $this->Form->Open(array('enctype' => 'multipart/form-data')) ?>
 <?php echo $this->Form->Errors() ?>
 
@@ -12,28 +11,15 @@ echo $this->Form->Open(array('enctype' => 'multipart/form-data')) ?>
 
 
 <li>
-<?php 
-//echo $this->Form->Label('Choose file', 'File');
-// array('To' => 'uploads/salesoutlet/exhibition')
-//echo $this->Form->UploadBox('File', array('UploadTo' => '/test'));
+<?php echo $this->Form->Label('Choose D file', 'FileD');
+echo $this->Form->UploadBox('FileD', array('Folder' => '/w'));
 ?>
 
 </li>
 
 <li>
 <?php echo $this->Form->Label('Choose C file', 'File');
-// array('To' => 'uploads/salesoutlet/exhibition')
-//echo $this->Form->UploadCBox('File', array('UploadTo' => '/test1'));
-echo $this->Form->UploadBox('File', array('UploadTo' => '/test1'));
-?>
-
-</li>
-
-<li>
-<?php 
-echo $this->Form->Label('Choose A file', 'File');
-// array('To' => 'uploads/salesoutlet/exhibition')
-//echo $this->Form->UploadDBox('DMoz', array('UploadTo' => '/test'));
+echo $this->Form->UploadBox('File', array('Folder' => '/test1', 'AddYear' => True));
 ?>
 
 </li>
@@ -47,7 +33,7 @@ echo $this->Form->Label('Choose A file', 'File');
 
 <li>
 <?php echo $this->Form->Label('Choose', 'File');
-echo $this->Form->UploadBox('ZFile', array('UploadTo' => '/test2'));
+echo $this->Form->UploadBox('ZFile', array('Folder' => '/test2'));
 ?>
 
 </li>

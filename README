@@ -1,0 +1,25 @@
+FEATURES:
+Some render improvements in form class. 
+- id attribute to form errors (for future jquery plugins/effects);
+- columned CheckBoxList()
+- HTML5 form input attributes (date/datetime picker)
+- allow strip long text values in dropdown menu
+- UploadBox() method. AJAX uploader.
+
+USAGE:
+// HTML5 form input attributes
+echo $this->Form->DateTimeBox('MyDate'); // Result: <input type="datetime" name="Form_MyDate" ...
+echo $this->Form->DateBox('MyDate'); // Result: <input type="date" name="Form_MyDate" ...
+echo $this->Form->TextBox('MyName', array('placeholder' => 'Enter your name here...'));
+// Result: <input type="date" name="Form_MyDate" placeholder="Enter your name here...">
+
+CONFIG:
+$Configuration['Plugins']['Morf']['MaxLengthDropDownTextField']['Window'] = 55;
+$Configuration['Plugins']['Morf']['MaxLengthDropDownTextField']['Default'] = 0;
+
+KNOWN BUGS:
+- Upload script doesn't work in opera
+
+TODO:
+- settings / config
+- jquery.easyListSplitter.js can replace Gdn_Form_CheckBoxList_Override()

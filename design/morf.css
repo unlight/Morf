@@ -36,3 +36,29 @@ div.MorfCheckBoxList ul.CheckBoxList,
 div.MorfCheckBoxList ul.CheckBoxList li {
 	padding:0 !important;
 }
+
+
+object.swfupload {
+	vertical-align: middle;
+	margin-top: 5px;
+}
+
+/* Uploadify v3.0.0 */
+
+.uploadifyButtonText {
+	font-size: 15px;
+/*	font-weight: bold;*/
+}
+
+div.uploadify {
+	display: inline;
+	margin-left: 5px;
+}
+
+div.uploadify * {
+	display: inline;
+}
+
+div.uploadifyQueue {
+	display: none;
+}
