@@ -12,7 +12,7 @@ echo $this->Form->Open(array('enctype' => 'multipart/form-data')) ?>
 
 <li>
 <?php echo $this->Form->Label('Choose D file', 'FileD');
-echo $this->Form->UploadBox('FileD', array('Folder' => '/w'));
+echo $this->Form->UploadBox('FileD', array('Folder' => '/w', 'value' => 'uploads/w/fireball.jpg'));
 ?>
 
 </li>
@@ -27,13 +27,13 @@ echo $this->Form->UploadBox('File', array('Folder' => '/test1', 'AddYear' => Tru
 <li>
 <?php 
 	echo $this->Form->Label('Result', 'MyResult');
-	echo $this->Form->TextBox('MyResult', array('value' => 1));
+	echo $this->Form->TextBox('MyResult');
 ?>
 </li>
 
 <li>
 <?php echo $this->Form->Label('Choose', 'File');
-echo $this->Form->UploadBox('ZFile', array('Folder' => '/test2'));
+echo $this->Form->UploadBox('ZFile', array('Folder' => '/test2', 'value' => 'uploads/w/fireball.jpg'));
 ?>
 
 </li>

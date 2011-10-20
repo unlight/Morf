@@ -62,3 +62,21 @@ div.uploadify * {
 div.uploadifyQueue {
 	display: none;
 }
+
+/* imgPreview jQuery plugin */
+
+#imgPreviewContainer {
+	border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    z-index: 999;
+    border: 8px solid rgba(0,0,0,0.4);
+}
+
+#imgPreviewContainer img {
+	max-height: 240px;
+	max-width: 320px;
+	margin: 0;
+	margin-bottom: -7px;
+	padding: 0;
+}
