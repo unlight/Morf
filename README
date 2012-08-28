@@ -1,25 +1,50 @@
-FEATURES:
-Some render improvements in form class. 
-- id attribute to form errors (for future jquery plugins/effects);
-- columned CheckBoxList()
-- HTML5 form input attributes (date/datetime picker)
-- allow strip long text values in dropdown menu
-- UploadBox() method. AJAX uploader.
+DESCRIPTION
+===========
+Provides some new useful methods for form class.
+* Columned CheckBoxList()
+* HTML5 form input attributes (date/datetime picker)
+* Allow strip long text values in dropdown menu
+* UploadBox() method (Flash uploader)
 
-USAGE:
+CONFIGURATION
+=============
+$Configuration['Plugins']['Morf']['MaxLengthDropDownTextField']['Window'] = 55;
+$Configuration['Plugins']['Morf']['MaxLengthDropDownTextField']['Default'] = 0;
+
+USAGE
+=====
 // HTML5 form input attributes
 echo $this->Form->DateTimeBox('MyDate'); // Result: <input type="datetime" name="Form_MyDate" ...
 echo $this->Form->DateBox('MyDate'); // Result: <input type="date" name="Form_MyDate" ...
 echo $this->Form->TextBox('MyName', array('placeholder' => 'Enter your name here...'));
-// Result: <input type="date" name="Form_MyDate" placeholder="Enter your name here...">
 
-CONFIG:
-$Configuration['Plugins']['Morf']['MaxLengthDropDownTextField']['Window'] = 55;
-$Configuration['Plugins']['Morf']['MaxLengthDropDownTextField']['Default'] = 0;
-
-KNOWN BUGS:
-- Upload script doesn't work in opera
-
-TODO:
+TODO
+====
 - settings / config
 - jquery.easyListSplitter.js can replace Gdn_Form_CheckBoxList_Override()
+
+CHANGELOG
+=========
+2.3.0 (29 Aug 2012)
+- updated uploadify to 3.2
+- changed upload button
+
+2.2.9 (30 Nov 2011)
+- removed native support for date/datetime (opera suck)
+- changed upload symbol
+- hacked vendor
+- fixed calendar error in IE
+- fixed close onselect bug in Safari
+
+2.2.8 (14 Nov 2011)
+- added DeliveryType = DATA to PostData
+
+2.2.7 (8 Nov 2011)
+- changed behaviour of DateBox and DateTimeBox fields
+- "choose date" button is removed
+
+2.2.6 (8 Nov 2011)
+- changelog started
+- upgraded uploadify to 3.0.0
+- fixed uploadify (removed getscript, moved lang file to jquery.uploadify.js)
+- removed jquery.uploadify.min.js

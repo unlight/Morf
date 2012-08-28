@@ -35,46 +35,33 @@ $(document).ready(function(){
 	var input = document.createElement("input");
 	
 	var testcalendar = function() {
-		return (typeof(Calendar) == 'function');
+		return (typeof(Calendar) != 'undefined' && typeof(Calendar._FD) != 'undefined');
 	}
 	
 	var makeinputcalendar = function(element, settings) {
-		if (element.type != "text") {
-			// Add reset button (beacuse it is gone in 11.50)
-			if ($.browser.opera && $.browser.version >= 11.5) {
-				$(document.createTextNode(" ")).insertAfter(element);
-				$('<button class="Button">…</button>')
-					.bind('click', function(){
-						$(this).prev().val('');
-						return false;
-					})
-					.insertAfter(element);
-				
-			}
-			return;
-		}
+		settings.displayArea = '.andSelf()';
 		if (!calendarloading){
 			calendarloading = true;
 			addcssfile('/skins/aqua/theme.css', dyndtwebroot);
-			IncludeJs( gdn.combinePaths(dyndtwebroot, '/jquery.dynDateTime.pack.js') );
-			IncludeJs( gdn.combinePaths(dyndtwebroot, '/lang/calendar-'+gdn.definition('CalendarLanguage')+'.js') );
+			IncludeJs([
+				gdn.combinePaths(dyndtwebroot, '/jquery.dynDateTime.js'),
+				gdn.combinePaths(dyndtwebroot, '/lang/calendar-'+gdn.definition('CalendarLanguage')+'.js')
+			]);
 		}
 		$.doWhen(testcalendar, function(){
-			settings.firstDay = Calendar._FD || 1;
+			settings.firstDay = (typeof Calendar._FD == 'undefined') ? 1 : Calendar._FD;
 			if ($(element).data('datetime') != null) return;
 			$(element).attr('autocomplete', 'off').data('datetime', true);
-			$('<button class="DateBoxPicker" title="Choose date…">…</button>').insertAfter(element);
-			$(document.createTextNode(" ")).insertAfter(element);
 			$(element).dynDateTime(settings);
 		});
 	};
 	
-	$("input[type=date]").livequery(function(){
-		makeinputcalendar(this, {ifFormat: "%Y-%m-%d", button: ".next()"});
+	$("input.InputBox.DateBox").livequery(function(){
+		makeinputcalendar(this, {ifFormat: "%Y-%m-%d"});
 	});
 	
-	$("input[type=datetime]").livequery(function(){
-		makeinputcalendar(this, {ifFormat: "%Y-%m-%d %H:%M", showsTime: true, button: ".next()"});
+	$("input.InputBox.DateTimeBox").livequery(function(){
+		makeinputcalendar(this, {ifFormat: "%Y-%m-%d %H:%M", showsTime: true});
 	});
 	
 	
@@ -86,7 +73,7 @@ $(document).ready(function(){
 	var LoadUploadify = function() {
 		if (UploadifyLoading) return;
 		UploadifyLoading = true;
-		IncludeJs( gdn.combinePaths(WebRoot, '/plugins/Morf/vendors/uploadify3/jquery.uploadify.min.js') );
+		IncludeJs( gdn.combinePaths(WebRoot, '/plugins/Morf/vendors/uploadify3/jquery.uploadify.js') );
 	}
 	
 	var TransientKey = gdn.definition('TransientKey');
@@ -99,16 +86,14 @@ $(document).ready(function(){
 		var TextBox = $(this).prev();
 		
 		var TriggerId = TextBox.attr('id') + '_' + Math.floor(Math.random() * 999999);
-		var Trigger = $('<span>', {
-			css: {display:'inline'},
-			id: TriggerId
-		});
-		$(TextBox).after(Trigger);
-		//this.filter(':linkingToImage(' + s.srcAttr + ')');
+		var TriggerHtml = '<span class="UploadBoxTrigger"><span style="display:inline" id="'+TriggerId+'"></span></span>';
+		$(TextBox).after(TriggerHtml);
 		
 		Data['TransientKey'] = TransientKey;
 		Data['SessionUserID'] = SessionUserID;
 		//Data['Debug'] = 1;
+		Data['Uploadify'] = 1;
+		Data['DeliveryType'] = 'DATA';
 		
 		var SetPreviewScript = function(Item) {
 			var Filepath = Item.val();
@@ -140,14 +125,16 @@ $(document).ready(function(){
 		}
 		
 		SetPreviewScript(TextBox);
-		
+
 		var SetUploadifyTrigger = function(){
+			var Trigger = $('#'+TriggerId);
 			Trigger.uploadify({
-				buttonText: '⇧',
+				//buttonText: '&#x2227;',
+				buttonText: 'upload',
 				checkExisting: false,
 				cancelImage: '',
-				height: 22,
-				width: 20,
+				height: 15,
+				width: 45,
 				postData: Data,
 				fileObjName: 'File',
 				debug: (typeof(Data['Debug']) != 'undefined'),
@@ -166,18 +153,26 @@ $(document).ready(function(){
 				},
 				onUploadComplete: function(file) {
 					TextBox.removeAttr('disabled');
-					//console.log('onUploadComplete', file);
 				},
 				onUploadSuccess: function(file, data, response) {
-					//console.log('onUploadSuccess', file, data, response);
 					$(TextBox).val(data);
 					SetPreviewScript(TextBox);
+					TextBox.removeAttr('disabled');
 				},
 				onUploadError: function(file, dummy, errorCode, errorMsg) {
 					gdn.informError(file.name + ': ' + errorMsg);
 					$(Trigger).uploadifyCancel(TriggerId);
 					$(Trigger).uploadifyClearQueue();
-				}
+				},
+				'onInit': function(instance) {
+					var textbox_height = $(TextBox).innerHeight();
+					var $button = $('#'+instance.settings.button_placeholder_id);
+					var $uploadboxtrigger = $button.parent();
+					var button_text_height = $uploadboxtrigger.innerHeight();
+					var initialmargintop = $uploadboxtrigger.css('margin-top');
+					var c = Math.ceil( (textbox_height - button_text_height) / 2);
+					$uploadboxtrigger.css('margin-top', c);
+		        }
 			});
 		}
 		
@@ -191,59 +186,106 @@ $(document).ready(function(){
 		//console.log($.placeHeld.clearPlace);
 	}
 	
-
+	// 4) Drag-n-drop upload to textbox
+	if (typeof $.fn.Uploader == 'function') {
+		var DragUploadSettings = {
+			BeforeSend: function() {
+				$(this.t).data('Selection', $(this.t).getSelection());
+			},
+			ServerComplete: function(EventArguments) {
+				var XHR = EventArguments.XHR;
+				var Data = EventArguments.Json;
+				if (XHR.status != 200) return gdn.informError(XHR);
+				var TextBox = this.t;
+				var Range = $(TextBox).data('Selection');
+				var TextVal = $(TextBox).val();
+				var Prefix = (/\s/.test(TextVal.substr(Range.start - 1, 1))) ? "\n" : '';
+				var NewText = TextVal.substr(0, Range.start)
+					+ Prefix
+					+ Data.Result
+					+ TextVal.substr(Range.start);
+				$(TextBox).val(NewText);
+				$(TextBox).setCursorPosition(Range.start + Data.Result.length + 1);
+			},
+			//Debug: true,
+			DeliveryType: 'DATA',
+			DeliveryMethod: 'JSON',
+			PostData: {Asset: 1},
+			Name: 'File',
+			PostUrl: gdn.url('/dashboard/plugin/receiveupload')
+		};
+		$('textarea.Uploader, input.Uploader').each(function(){
+			DragUploadSettings.t = this;
+			$(this).Uploader(DragUploadSettings);
+		});
+	}
 	
 });
+
+// http://stackoverflow.com/questions/499126/jquery-set-cursor-position-in-text-area
+new function($) {
+	$.fn.setCursorPosition = function(pos) {
+		if ($(this).get(0).setSelectionRange) {
+			$(this).get(0).setSelectionRange(pos, pos);
+		} else if ($(this).get(0).createTextRange) {
+			var range = $(this).get(0).createTextRange();
+			range.collapse(true);
+			range.moveEnd('character', pos);
+			range.moveStart('character', pos);
+			range.select();
+		}
+	}
+}(jQuery);
 
 
 
 /*
- * imgPreview jQuery plugin
- * Copyright (c) 2009 James Padolsey
- * j@qd9.co.uk | http://james.padolsey.com
- * Dual licensed under MIT and GPL.
- * Updated: 09/02/09
- * @author James Padolsey
- * @version 0.22.1
- */
+* imgPreview jQuery plugin
+* Copyright (c) 2009 James Padolsey
+* j@qd9.co.uk | http://james.padolsey.com
+* Dual licensed under MIT and GPL.
+* Updated: 09/02/09
+* @author James Padolsey
+* @version 0.22.1
+*/
 
 // Fixed by S
 
 (function($){
-    
-    $.expr[':'].linkingToImage = function(elem, index, match){
-        // This will return true if the specified attribute contains a valid link to an image:
-        return !! ($(elem).attr(match[3]) && $(elem).attr(match[3]).match(/\.(gif|jpe?g|png|bmp)$/i));
-    };
-    
-    $.fn.imgPreview = function(userDefinedSettings){
-        
-        var s = $.extend({
-            
-            /* DEFAULTS */
-            
-            // CSS to be applied to image:
-            imgCSS: {},
-            // Distance between cursor and preview:
-            distanceFromCursor: {top:10, left:10},
-            // Boolean, whether or not to preload images:
-            preloadImages: true,
-            // Callback: run when link is hovered: container is shown:
-            onShow: function(){},
-            // Callback: container is hidden:
-            onHide: function(){},
-            // Callback: Run when image within container has loaded:
-            onLoad: function(){},
-            // ID to give to container (for CSS styling):
-            containerID: 'imgPreviewContainer',
-            // Class to be given to container while image is loading:
-            containerLoadingClass: 'loading',
-            // Prefix (if using thumbnails), e.g. 'thumb_'
-            thumbPrefix: '',
-            // Where to retrieve the image from:
-            srcAttr: 'href'
-            
-        }, userDefinedSettings);
+	
+	$.expr[':'].linkingToImage = function(elem, index, match){
+		// This will return true if the specified attribute contains a valid link to an image:
+		return !! ($(elem).attr(match[3]) && $(elem).attr(match[3]).match(/\.(gif|jpe?g|png|bmp)$/i));
+	};
+	
+	$.fn.imgPreview = function(userDefinedSettings){
+		
+		var s = $.extend({
+			
+			/* DEFAULTS */
+			
+			// CSS to be applied to image:
+			imgCSS: {},
+			// Distance between cursor and preview:
+			distanceFromCursor: {top:10, left:10},
+			// Boolean, whether or not to preload images:
+			preloadImages: true,
+			// Callback: run when link is hovered: container is shown:
+			onShow: function(){},
+			// Callback: container is hidden:
+			onHide: function(){},
+			// Callback: Run when image within container has loaded:
+			onLoad: function(){},
+			// ID to give to container (for CSS styling):
+			containerID: 'imgPreviewContainer',
+			// Class to be given to container while image is loading:
+			containerLoadingClass: 'loading',
+			// Prefix (if using thumbnails), e.g. 'thumb_'
+			thumbPrefix: '',
+			// Where to retrieve the image from:
+			srcAttr: 'href'
+			
+		}, userDefinedSettings);
 		
 		// Fixed by S
 		var $container = $('#'+s.containerID);
@@ -253,101 +295,101 @@ $(document).ready(function(){
 							.css('position','absolute')
 							.appendTo('body');
 		}
-            
-        var $img = $('img', $container).css(s.imgCSS),
-        
-        // Get all valid elements (linking to images / ATTR with image link):
-        $collection = this.filter(':linkingToImage(' + s.srcAttr + ')');
-        
-        // Re-usable means to add prefix (from setting):
-        function addPrefix(src) {
-            return src.replace(/(\/?)([^\/]+)$/,'$1' + s.thumbPrefix + '$2');
-        }
-        
-        if (s.preloadImages) {
-            (function(i){
-                var tempIMG = new Image(),
-                    callee = arguments.callee;
-                tempIMG.src = addPrefix($($collection[i]).attr(s.srcAttr));
-                tempIMG.onload = function(){
-                    $collection[i + 1] && callee(i + 1);
-                };
-            })(0);
-        }
-        
-        $collection
-            .mousemove(function(e){
-                $container.css({
-                    top: e.pageY + s.distanceFromCursor.top + 'px',
-                    left: e.pageX + s.distanceFromCursor.left + 'px'
-                });
-                
-            })
-            .hover(function(){
-                
-                var link = this;
-                $container
-                    .addClass(s.containerLoadingClass)
-                    .show();
-                $img
-                    .load(function(){
-                        $container.removeClass(s.containerLoadingClass);
-                        $img.show();
-                        s.onLoad.call($img[0], link);
-                    })
-                    .attr( 'src' , addPrefix($(link).attr(s.srcAttr)) );
-                s.onShow.call($container[0], link);
-                
-            }, function(){
-                
-                $container.hide();
-                $img.unbind('load').attr('src','').hide();
-                s.onHide.call($container[0], this);
-                
-            });
-        
-        // Return full selection, not $collection!
-        return this;
-        
-    };
-    
+			
+		var $img = $('img', $container).css(s.imgCSS),
+		
+		// Get all valid elements (linking to images / ATTR with image link):
+		$collection = this.filter(':linkingToImage(' + s.srcAttr + ')');
+		
+		// Re-usable means to add prefix (from setting):
+		function addPrefix(src) {
+			return src.replace(/(\/?)([^\/]+)$/,'$1' + s.thumbPrefix + '$2');
+		}
+		
+		if (s.preloadImages) {
+			(function(i){
+				var tempIMG = new Image(),
+					callee = arguments.callee;
+				tempIMG.src = addPrefix($($collection[i]).attr(s.srcAttr));
+				tempIMG.onload = function(){
+					$collection[i + 1] && callee(i + 1);
+				};
+			})(0);
+		}
+		
+		$collection
+			.mousemove(function(e){
+				$container.css({
+					top: e.pageY + s.distanceFromCursor.top + 'px',
+					left: e.pageX + s.distanceFromCursor.left + 'px'
+				});
+				
+			})
+			.hover(function(){
+				
+				var link = this;
+				$container
+					.addClass(s.containerLoadingClass)
+					.show();
+				$img
+					.load(function(){
+						$container.removeClass(s.containerLoadingClass);
+						$img.show();
+						s.onLoad.call($img[0], link);
+					})
+					.attr( 'src' , addPrefix($(link).attr(s.srcAttr)) );
+				s.onShow.call($container[0], link);
+				
+			}, function(){
+				
+				$container.hide();
+				$img.unbind('load').attr('src','').hide();
+				s.onHide.call($container[0], this);
+				
+			});
+		
+		// Return full selection, not $collection!
+		return this;
+		
+	};
+	
 })(jQuery);
 
 
 
 /*
- * doWhen jQuery plugin
- * Copyright 2011, Emmett Pickerel
- * Released under the MIT Licence.
- */
+* doWhen jQuery plugin
+* Copyright 2011, Emmett Pickerel
+* Released under the MIT Licence.
+*/
 
 /* jQuery.doWhen(function(){
-  return !!document.getElementById('myelement');
+return !!document.getElementById('myelement');
 }, function(){
-  document.getElementById('myelement').innerHTML = "I'm loaded"!
+document.getElementById('myelement').innerHTML = "I'm loaded"!
 });
 */
 
 !function($){
 var defaults, tick, start;
 defaults = {
-  interval: 100
+interval: 100
 };
 tick = function(iVars){
-  if (iVars.test()) {
-    clearInterval(iVars.iid);
-    iVars.cb.call(iVars.context || window, iVars.data);
-  }
+if (iVars.test()) {
+	clearInterval(iVars.iid);
+	iVars.cb.call(iVars.context || window, iVars.data);
+}
 };
 start = function(iVars){
-  iVars.iid = setInterval(function(){
-    tick(iVars);
-  }, iVars.interval);
+iVars.iid = setInterval(function(){
+	tick(iVars);
+}, iVars.interval);
 };
 $.doWhen = function(test, cb, cfg){
-  start($.extend({
-    test: test,
-    cb: cb
-  }, defaults, cfg));
+start($.extend({
+	test: test,
+	cb: cb
+}, defaults, cfg));
 };
 }(jQuery);

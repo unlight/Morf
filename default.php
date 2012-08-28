@@ -2,23 +2,30 @@
 
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
-	'Description' => 'Extended form class.',
-	'Version' => '1.3.0',
+	'Description' => 'Provides some new useful methods for form class. Allow upload files.',
+	'Version' => '2.3.0',
 	'Date' => '19 May 2011',
-	'Updated' => 'Autumn 2011',
-	'Author' => 'Frostbite',
+	'Updated' => 'Summer 2012',
+	'Author' => 'Chicken Grinder',
 	'AuthorUrl' => 'http://www.malevolence2007.com',
 	'RequiredPlugins' => array('UsefulFunctions' => '>=3.5'),
-	'RegisterPermissions' => array('Plugins.Morf.Upload.Allow'),
+	'RegisterPermissions' => array(
+		'Plugins.Morf.Upload.Allow',
+		'Plugins.Morf.Upload.Overwrite'
+	),
 	'License' => 'Liandri License'
 );
 
 class MorfPlugin extends Gdn_Plugin {
 	
+	public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+		$Menu =& $Sender->EventArguments['SideMenu'];
+		$Menu->AddLink('Dashboard', T('Upload File'), 'dashboard/plugin/loadup', 'Plugins.Morf.Upload.Allow');
+	}
+	
 	public function PluginController_MorfTest_Create($Sender) {
-		$Sender->Permission('Garden.Admin.Only');
 		$Sender->Form = Gdn::Factory('Form', 'Client');
-		$Sender->View = $this->GetView('morftest.php');
+		$Sender->View = $this->GetView('~morftest.php');
 		$Sender->Render();
 	}
 	
@@ -34,7 +41,7 @@ class MorfPlugin extends Gdn_Plugin {
 		
 		if (!$Folder) {
 			$Folder = GetValue('UploadTo', $Attributes, '', True);
-			if (Debug() && $Folder) trigger_error("You should use 'Folder' instead of 'UploadTo'", E_USER_DEPRECATED);
+			if (Debug() && $Folder) trigger_error("You should use 'Folder' instead of 'UploadTo'.", E_USER_DEPRECATED);
 		}
 		
 		if (CheckPermission('Plugins.Morf.Upload.Allow')) {
@@ -51,8 +58,8 @@ class MorfPlugin extends Gdn_Plugin {
 		$Attributes =& $Form->EventArguments[1];
 
 		$Class = ArrayValueI('class', $Attributes, False);
-		if ($Class === False) $Attributes['class'] = 'InputBox'; // DateBox?
-		return $Form->Input($FieldName, 'date', $Attributes);
+		if ($Class === False) $Attributes['class'] = 'InputBox DateBox';
+		return $Form->Input($FieldName, 'text', $Attributes);
 	}
 	
 	public function Gdn_Form_DateTimeBox_Create($Form) {
@@ -61,8 +68,8 @@ class MorfPlugin extends Gdn_Plugin {
 		$Attributes =& $Form->EventArguments[1];
 		
 		$Class = ArrayValueI('class', $Attributes, False);
-		if ($Class === False) $Attributes['class'] = 'InputBox'; // DateBox?
-		return $Form->Input($FieldName, 'datetime', $Attributes);
+		if ($Class === False) $Attributes['class'] = 'InputBox DateTimeBox';
+		return $Form->Input($FieldName, 'text', $Attributes);
 	}
 	
 	public function Gdn_Form_ClearErrors_Create($Form) {
@@ -92,7 +99,7 @@ class MorfPlugin extends Gdn_Plugin {
 				}
 			} elseif (is_array($DataSet)) {
 				// ResultSet is unexpected here
-				foreach($DataSet as &$Value) {
+				foreach ($DataSet as &$Value) {
 					$Value = SliceString($Value, $MaxTextLength);
 				}
 			}
@@ -109,7 +116,7 @@ class MorfPlugin extends Gdn_Plugin {
 	}
 	
 	public function Gdn_Form_CheckBoxList_Override($Form) {
-		
+		// TODO: LOOK FOR EASYLISTSPLITTER 1.0.2 - JQUERY PLUGIN INSTEAD
 		$FieldName =& $Form->EventArguments[0];
 		$DataSet =& $Form->EventArguments[1];
 		$ValueDataSet =& $Form->EventArguments[2];
@@ -165,9 +172,37 @@ class MorfPlugin extends Gdn_Plugin {
 		return $Result;
 	}
 	
+	public function PluginController_LoadUp_Create($Sender) {
+		$Sender->AddSideMenu('dashboard/plugin/loadup');
+		
+		$Sender->Permission('Plugins.Morf.Upload.Allow');
+		if (!property_exists($Sender, 'Form')) $Sender->Form = Gdn::Factory('Form');
+		
+		$Sender->AddJsFile('jquery.livequery.js');
+		$Sender->AddJsFile('jquery.autogrow.js');
+		$Sender->AddJsFile('plugins/Morf/js/loadup.js');
+		
+		$Session = Gdn::Session();
+		
+		if ($Sender->Form->AuthenticatedPostBack() != False) {
+			$UploadTo = $Sender->Form->GetFormValue('UploadTo');
+			if (!$UploadTo) $UploadTo = 'uploads/i/' . date('Y') . '/' . date('m');
+			$bOverwrite = $Sender->Form->GetFormValue('Overwrite') && $Session->CheckPermission('Plugins.Morf.Upload.Overwrite');
+			$Options = array('Overwrite' => $bOverwrite, 'WebTarget' => True);
+			$UploadedFiles = UploadFile($UploadTo, 'Files', $Options);
+			$Sender->Form->SetFormValue('RawData', implode("\n", $UploadedFiles));
+			$Sender->Form->SetFormValue('AbsoluteURL', 1);
+		}
+		
+		$Sender->UploadTo = array('uploads/tmp' => 'uploads/tmp');
+		$Sender->View = $this->GetView('upload.php');
+		$Sender->Title(T('Upload File'));
+		$Sender->Render();
+	}
+	
 	public function PluginController_ReceiveUpload_Create($Sender) {
-		$IncomingTransientKey = GetPostValue('TransientKey');
-		$IncomingUserID = GetPostValue('SessionUserID');
+		$IncomingTransientKey = GetPostValue('TransientKey', Gdn::Session()->TransientKey());
+		$IncomingUserID = GetPostValue('SessionUserID', Gdn::Session()->UserID);
 		$Folder = GetPostValue('Folder');
 		$User = Gdn::UserModel()->GetID($IncomingUserID);
 		$UserTransientKey = GetValueR('Attributes.TransientKey', $User);
@@ -179,11 +214,21 @@ class MorfPlugin extends Gdn_Plugin {
 		if (substr($Folder, 0, 7) == 'uploads') $Folder = trim(substr($Folder, 7), '/\\');
 		if (!$Folder || $Folder == 'false') {
 			$Folder = 'i';
-			$_POST['AddYear'] = 1;
-			$_POST['AddMonth'] = 1;
+			$_POST['AddYear'] = True;
+			$_POST['AddMonth'] = True;
 		}
 		
-		if (GetPostValue('Debug')) file_put_contents(__DIR__.'/post_'.rand(0, 99999).'.txt', var_export($_POST, True));
+		if (GetPostValue('Debug')) {
+			$DEBUG = array(
+				'$_POST' => $_POST, 
+				'$IncomingTransientKey' => $IncomingTransientKey, 
+				'$IncomingUserID' => $IncomingUserID,
+				'$Sender->DeliveryType()' => $Sender->DeliveryType(),
+				'$Sender->DeliveryMethod()' => $Sender->DeliveryMethod(),
+				'Uploadify' => GetPostValue('Uploadify')
+			);
+			file_put_contents(__DIR__.'/post_'.rand(0, 99999).'.txt', var_export($DEBUG, True));
+		}
 
 		//$TargetFolder = PATH_UPLOADS . DS . $Folder;
 		$TargetFolder = 'uploads' . DS . $Folder;
@@ -191,15 +236,21 @@ class MorfPlugin extends Gdn_Plugin {
 		if (GetPostValue('AddMonth')) $TargetFolder .= DS . date('m');
 		
 		$Result = UploadFile($TargetFolder, 'File', array('WebTarget' => True));
-		//if (strpos(PATH_UPLOADS, PATH_ROOT) === 0) $Result = substr($Result, strlen(PATH_ROOT));
-		echo $Result;
+		if (GetPostValue('Asset')) $Result = Asset($Result);
+
+		if (GetPostValue('Uploadify')) {
+			echo $Result;
+			return;
+		}
+		
+		$Sender->SetData('Result', $Result);
+		$Sender->Render();
 	}
 	
 	public function Base_Render_Before($Sender) {
 		if (property_exists($Sender, 'Form') && $Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
 			$Sender->AddCssFile('plugins/Morf/design/morf.css');
 			$Sender->AddJsFile('plugins/Morf/js/jquery.placeheld.js');
-			$Sender->AddJsFile('plugins/Morf/vendors/dowhen/jquery.dowhen.min.js');
 			$Language = ArrayValue(0, explode('-', Gdn::Locale()->Current()));
 			foreach (array($Language, 'en') as $Language) {
 				$LanguageJsFile = 'vendors/jquery.dynDateTime/lang/calendar-'.$Language.'.js';
@@ -208,26 +259,48 @@ class MorfPlugin extends Gdn_Plugin {
 					break;
 				}
 			}
+			$Session = Gdn::Session();
+			if ($Session->CheckPermission('Plugins.Morf.Upload.Allow')) {
+				$Sender->AddJsFile('plugins/Morf/js/jquery-fieldselection.js');
+				$Sender->AddJsFile('plugins/Morf/js/jquery.uploader.js');
+			}
 			$Sender->AddJsFile('plugins/Morf/js/morf.js');
-			$Sender->AddDefinition('SessionUserID', Gdn::Session()->UserID);
+			$Sender->AddDefinition('SessionUserID', $Session->UserID);
 		}
 	}
 	
 	// plugin/reenablemorf
 	public function PluginController_ReEnableMorf_Create($Sender) {
 		$Sender->Permission('Garden.Admin.Only');
-		$Session = Gdn::Session();
-		$TransientKey = $Session->TransientKey();
+		$TransientKey = Gdn::Session()->TransientKey();
 		RemoveFromConfig('EnabledPlugins.Morf');
 		Redirect('settings/plugins/all/Morf/'.$TransientKey);
 	}
 	
+	public function Tick_Match_30_Minutes_05_Hours_Handler() { // every night
+		// 1. Clean-up temp uploads
+		$KeepThis = array('README');
+		$MonthAgo = strtotime('30 days ago');
+		$Directory = 'uploads/tmp';
+		if (!file_exists($Directory)) return;
+		foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($Directory)) as $File) {
+			if (in_array($File->GetFilename(), $KeepThis)) continue;
+			$Pathname = $File->GetPathname();
+			if ($MonthAgo > $File->GetMTime()) unlink($Pathname);
+			Console::Message('Removed: ^3%s', $Pathname);
+		}
+	}
+	
 	public function Structure() {
-		$PermissionModel = Gdn::PermissionModel();
-		$PermissionModel->Define('Plugins.Morf.Upload.Allow');
+		$RegisterPermissions = GetValue('RegisterPermissions', Gdn::PluginManager()->GetPluginInfo('Morf'));
+		if ($RegisterPermissions) Gdn::PermissionModel()->Define($RegisterPermissions);
 	}
 	
 	public function Setup() {
+		if (!is_dir('uploads/tmp')) mkdir('uploads/tmp', 0777, True);
+		if (!is_dir('uploads/i')) mkdir('uploads/i', 0777, True);
+		RemoveFromConfig('EnabledPlugins.LoadUp');
+		RemoveFromConfig('Plugins.LoadUp');
 		$this->Structure();
 	}
 

@@ -93,8 +93,11 @@
 					if (typeof this_inputField.onchange == "function")
 						this_inputField.onchange();
 				}
-				if (update && this_displayArea)
-					this_displayArea.innerHTML = cal.date.print(p.daFormat);
+				if (update && this_displayArea) {
+					try {
+						this_displayArea.innerHTML = cal.date.print(p.daFormat);
+					} catch (e) {}
+				}
 				if (update && typeof p.onUpdate == "function")
 					p.onUpdate(cal);
 				if (update && p.flat) {
