@@ -31,12 +31,12 @@ div.calendar table {
 }
 
 
-
 div.MorfCheckBoxList ul.CheckBoxList,
 div.MorfCheckBoxList ul.CheckBoxList li {
 	padding:0 !important;
 }
 
+/* Uploadify v3.0.0 */
 
 object.swfupload {
 	vertical-align: middle;
@@ -44,8 +44,6 @@ object.swfupload {
 	height: 100%;
 	top: 0px;
 }
-
-/* Uploadify v3.0.0 */
 
 div.uploadify {
 	display: inline;
@@ -56,11 +54,11 @@ div.uploadify * {
 	display: inline;
 }
 
-div.uploadify-queue {
+div.uploadifyQueue {
 	display: none;
 }
 
-.uploadify-button {
+.uploadifyButtonText {
 	font-size: 90%;
 	border: 1px solid #ddd;
 	-webkit-border-radius: 2px;

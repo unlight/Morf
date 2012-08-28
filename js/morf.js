@@ -163,21 +163,25 @@ $(document).ready(function(){
 					gdn.informError(file.name + ': ' + errorMsg);
 					$(Trigger).uploadifyCancel(TriggerId);
 					$(Trigger).uploadifyClearQueue();
-				},
-				'onInit': function(instance) {
-					var textbox_height = $(TextBox).innerHeight();
-					var $button = $('#'+instance.settings.button_placeholder_id);
-					var $uploadboxtrigger = $button.parent();
-					var button_text_height = $uploadboxtrigger.innerHeight();
-					var c = Math.ceil( (textbox_height - button_text_height) / 2 );
-					$uploadboxtrigger.css('margin-top', c);
-					var button_text_width = $uploadboxtrigger.width();
-					$uploadboxtrigger.css('margin-left', - (button_text_width + (c * 0.5) ));
-		        }
+				}
 			});
-		}
+		};
 		
-		$.doWhen(TestUploadify, SetUploadifyTrigger);
+		var onInit = function() {
+			var textbox_height = $(TextBox).innerHeight();
+			var $button = $('#'+TriggerId);
+			var $uploadboxtrigger = $button.parent();
+			var button_text_height = $uploadboxtrigger.innerHeight();
+			var c = Math.ceil( (textbox_height - button_text_height) / 2 );
+			$uploadboxtrigger.css('margin-top', c);
+			var button_text_width = $uploadboxtrigger.width();
+			$uploadboxtrigger.css('margin-left', - (button_text_width + (c * 0.5) ));
+		};
+		
+		$.doWhen(TestUploadify, function(){
+			SetUploadifyTrigger();
+			onInit();
+		});
 		
 	});
 	
