@@ -169,9 +169,10 @@ $(document).ready(function(){
 					var $button = $('#'+instance.settings.button_placeholder_id);
 					var $uploadboxtrigger = $button.parent();
 					var button_text_height = $uploadboxtrigger.innerHeight();
-					var initialmargintop = $uploadboxtrigger.css('margin-top');
-					var c = Math.ceil( (textbox_height - button_text_height) / 2);
+					var c = Math.ceil( (textbox_height - button_text_height) / 2 );
 					$uploadboxtrigger.css('margin-top', c);
+					var button_text_width = $uploadboxtrigger.width();
+					$uploadboxtrigger.css('margin-left', - (button_text_width + (c * 0.5) ));
 		        }
 			});
 		}

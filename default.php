@@ -3,7 +3,7 @@
 $PluginInfo['Morf'] = array(
 	'Name' => 'Morf',
 	'Description' => 'Provides some new useful methods for form class. Allow upload files.',
-	'Version' => '2.3.0',
+	'Version' => '2.3.1',
 	'Date' => '19 May 2011',
 	'Updated' => 'Summer 2012',
 	'Author' => 'Chicken Grinder',

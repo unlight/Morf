@@ -27,8 +27,6 @@ echo $this->Form->TextBox('TextArea', array('MultiLine' => True, 'class' => 'Tex
 
 </li>
 
-<?php /*
-<li>
 <?php echo $this->Form->Label('Choose D file', 'FileD');
 echo $this->Form->UploadBox('FileD', array('Folder' => '/w', 'value' => 'uploads/w/fireball.jpg'));
 ?>
@@ -57,7 +55,7 @@ echo $this->Form->UploadBox('File', array('Folder' => '/test1', 'AddYear' => Tru
 echo $this->Form->UploadBox('ZFile', array('Folder' => '/test2', 'value' => 'uploads/w/fireball.jpg'));
 ?>
 
-</li>*/ ?>
+</li>
 	
 </ul>
 <?php echo $this->Form->Button('Upload') ?>
