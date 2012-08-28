@@ -163,7 +163,16 @@ $(document).ready(function(){
 					gdn.informError(file.name + ': ' + errorMsg);
 					$(Trigger).uploadifyCancel(TriggerId);
 					$(Trigger).uploadifyClearQueue();
-				}
+				},
+				'onInit': function(instance) {
+					var textbox_height = $(TextBox).innerHeight();
+					var $button = $('#'+instance.settings.button_placeholder_id);
+					var $uploadboxtrigger = $button.parent();
+					var button_text_height = $uploadboxtrigger.innerHeight();
+					var initialmargintop = $uploadboxtrigger.css('margin-top');
+					var c = Math.ceil( (textbox_height - button_text_height) / 2);
+					$uploadboxtrigger.css('margin-top', c);
+		        }
 			});
 		}
 		

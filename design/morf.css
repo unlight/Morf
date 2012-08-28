@@ -47,16 +47,6 @@ object.swfupload {
 
 /* Uploadify v3.0.0 */
 
-.uploadifyButtonText {
-	font-size: 10px;
-	/*font-weight: bold;*/
-	border: 1px solid #ddd;
-	-webkit-border-radius: 2px;
-	-moz-border-radius: 2px;
-	border-radius: 2px;
-	padding: 0 2px;
-}
-
 div.uploadify {
 	display: inline;
 	margin-left: 4px;
@@ -66,14 +56,24 @@ div.uploadify * {
 	display: inline;
 }
 
-div.uploadifyQueue {
+div.uploadify-queue {
 	display: none;
+}
+
+.uploadify-button {
+	font-size: 90%;
+	border: 1px solid #ddd;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+	padding: 0 3px;
 }
 
 .UploadBoxTrigger {
 	display: inline;
+	line-height: 100%;
 	position: absolute;
-	margin-left: -50px; 
+	margin-left: -55px; 
 	margin-top: 5px;
 }
 
