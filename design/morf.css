@@ -1,0 +1,96 @@
+/* PlaceHeld jQuery plugin*/
+input:-moz-placeholder { color:#bbb;}
+input.placeheld { color:#bbb;}
+input::-webkit-input-placeholder { color:#bbb;}
+
+/* div.Popup has z-index 5000 */
+div.calendar { z-index: 5001 !important;}
+div.calendar table {
+	margin: 0 !important;
+	width:auto !important;
+}
+
+.MorfCheckBoxList {
+	display:inline-block;
+}
+
+.MorfCheckBoxList ul.CheckBoxList li {
+	border:0;
+	margin:0;
+	/*padding:0;*/
+}
+
+.Width1of4 {
+	width:25%;
+}
+.Width1of3 {
+	width:33.33%;
+}
+.Width1of2 {	
+	width:50%;
+}
+
+
+
+div.MorfCheckBoxList ul.CheckBoxList,
+div.MorfCheckBoxList ul.CheckBoxList li {
+	padding:0 !important;
+}
+
+
+object.swfupload {
+	vertical-align: middle;
+	width: 100%;
+	height: 100%;
+	top: 0px;
+}
+
+/* Uploadify v3.0.0 */
+
+.uploadifyButtonText {
+	font-size: 10px;
+	/*font-weight: bold;*/
+	border: 1px solid #ddd;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+	padding: 0 2px;
+}
+
+div.uploadify {
+	display: inline;
+	margin-left: 4px;
+}
+
+div.uploadify * {
+	display: inline;
+}
+
+div.uploadifyQueue {
+	display: none;
+}
+
+.UploadBoxTrigger {
+	display: inline;
+	position: absolute;
+	margin-left: -50px; 
+	margin-top: 5px;
+}
+
+/* imgPreview jQuery plugin */
+
+#imgPreviewContainer {
+	border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    z-index: 50001;
+    border: 8px solid rgba(0,0,0,0.4);
+}
+
+#imgPreviewContainer img {
+	max-height: 240px;
+	max-width: 320px;
+	margin: 0;
+	margin-bottom: -7px;
+	padding: 0;
+}
